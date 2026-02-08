@@ -11,11 +11,11 @@ docker rm panda-wiki-api || true
 
 # 重新构建 api 容器
 echo "2. 重新构建 api 容器..."
-docker-compose -f docker-compose.yml build api
+docker-compose -f docker compose.yml build api
 
 # 启动 api 容器
 echo "3. 启动 api 容器..."
-docker-compose -f docker-compose.yml up -d api
+docker-compose -f docker compose.yml up -d api
 
 # 检查启动状态
 echo "4. 检查 api 容器启动状态..."
