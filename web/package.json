@@ -1,11 +1,11 @@
 {
-  "name": "@app",
+  "name": "@panda-wiki",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "icon": "pnpm --filter @app/icons icon",
+    "icon": "pnpm --filter @panda-wiki/icons icon",
     "prepare": "cd ../ && husky web/.husky",
     "build": "pnpm --parallel --filter admin --filter app build",
     "dev": "pnpm --parallel --filter admin --filter app dev"
@@ -28,9 +28,9 @@
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "react-hook-form": "^7.62.0",
-    "@app/icons": "workspace:*",
-    "@app/themes": "workspace:*",
-    "@app/ui": "workspace:*"
+    "@panda-wiki/icons": "workspace:*",
+    "@panda-wiki/themes": "workspace:*",
+    "@panda-wiki/ui": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^24.3.1",

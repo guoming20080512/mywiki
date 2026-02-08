@@ -241,37 +241,7 @@ const QaModal: React.FC<QaModalProps> = () => {
           <SearchDocContent inputRef={inputRef} placeholder={placeholder} />
         </Box>
 
-        {/* 底部AI生成提示 */}
-        <Box
-          sx={{
-            px: 3,
-            pt: !kbDetail?.settings?.conversation_setting
-              ?.copyright_hide_enabled
-              ? 2
-              : 0,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <Typography
-            variant='caption'
-            sx={{
-              color: 'text.disabled',
-              fontSize: 12,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1,
-            }}
-          >
-            <Box>
-              {!kbDetail?.settings?.conversation_setting
-                ?.copyright_hide_enabled &&
-                (kbDetail?.settings?.conversation_setting?.copyright_info ||
-                  '')}
-            </Box>
-          </Typography>
-        </Box>
+
       </Box>
     </Modal>
   );
