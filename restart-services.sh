@@ -1,10 +1,19 @@
 #!/bin/bash
 
 # 进入项目根目录
-cd /data/wiki/mywiki
+cd "$(dirname "$0")"
 
 # 加载环境变量
 export $(grep -v '^#' .env | xargs)
+
+echo "=== 停止所有运行的容器 ==="
+# 停止所有容器
+docker stop $(docker ps -q --filter "name=panda-wiki-") 2>/dev/null || echo "没有运行的容器"
+
+# 删除所有容器
+docker rm $(docker ps -aq --filter "name=panda-wiki-") 2>/dev/null || echo "没有容器需要删除"
+
+echo "=== 开始启动服务 ==="
 
 # 1. 网络准备
 docker network create --subnet=${SUBNET_PREFIX:-169.254.15}.0/24 panda-wiki 2>/dev/null || echo "网络已存在"
@@ -23,6 +32,9 @@ docker run -d \
   -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
   -e POSTGRES_DB=panda-wiki \
   chaitin-registry.cn-hangzhou.cr.aliyuncs.com/chaitin/postgres-zhparser:17.6-bookworm
+
+# 等待 PostgreSQL 启动
+sleep 5
 
 # 2.2 启动 Redis
 docker run -d \
@@ -58,6 +70,9 @@ docker run -d \
   chaitin-registry.cn-hangzhou.cr.aliyuncs.com/chaitin/panda-wiki-nats:2.11.3-alpine \
   nats-server -c /etc/nats/nats.conf --user panda-wiki --pass $NATS_PASSWORD
 
+# 等待 NATS 启动
+sleep 5
+
 # 2.5 启动 Qdrant
 docker run -d \
   --name panda-wiki-qdrant \
@@ -92,6 +107,9 @@ docker run -d \
   -e NATS_PASSWORD=$NATS_PASSWORD \
   chaitin-registry.cn-hangzhou.cr.aliyuncs.com/chaitin/raglite:v2.14.1
 
+# 等待 Raglite 启动
+sleep 3
+
 # 3.2 启动 Caddy
 docker run -d \
   --name panda-wiki-caddy \
@@ -107,11 +125,17 @@ docker run -d \
   -e CADDY_ADMIN=unix//var/run/caddy/caddy-admin.sock \
   chaitin-registry.cn-hangzhou.cr.aliyuncs.com/chaitin/panda-wiki-caddy:2.10-alpine
 
+# 等待 Caddy 启动
+sleep 3
+
 # 4. 启动核心服务
 echo "=== 启动核心服务 ==="
 
 # 4.1 启动 API 服务（本地构建）
 docker build -t panda-wiki-api -f ./backend/Dockerfile.api ./backend
+
+# 等待构建完成
+sleep 10
 
 docker run -d \
   --name panda-wiki-api \
@@ -129,6 +153,9 @@ docker run -d \
   -e ADMIN_PASSWORD=$ADMIN_PASSWORD \
   -e SUBNET_PREFIX=${SUBNET_PREFIX:-169.254.15} \
   panda-wiki-api
+
+# 等待 API 启动
+sleep 5
 
 # 4.2 启动 Consumer
 docker run -d \
@@ -163,20 +190,29 @@ docker run -d \
 echo "=== 启动前端服务 ==="
 
 # 5.1 构建前端应用
-cd /Volumes/s/work2026/PandaWiki-3.70.2/web && NODE_OPTIONS="--max-old-space-size=4096" pnpm build
+cd ./web && NODE_OPTIONS="--max-old-space-size=4096" pnpm build
+
+# 等待构建完成
+sleep 15
 
 # 5.2 构建并启动 App 服务
-docker build -t panda-wiki-app ./web/app
+docker build -t panda-wiki-app ./app
+
+# 等待构建完成
+sleep 10
 
 docker run -d \
   --name panda-wiki-app \
   --network panda-wiki \
   --ip ${SUBNET_PREFIX:-169.254.15}.112 \
-  -p 3000:3010 \
+  -p 3001:3010 \
   panda-wiki-app
 
 # 5.3 构建并启动 Nginx 服务
-docker build -t panda-wiki-nginx ./web/admin
+docker build -t panda-wiki-nginx ./admin
+
+# 等待构建完成
+sleep 5
 
 docker run -d \
   --name panda-wiki-nginx \
@@ -188,4 +224,5 @@ docker run -d \
 
 # 6. 验证服务状态
 echo "=== 服务启动完成，验证状态 ==="
+sleep 5
 docker ps
