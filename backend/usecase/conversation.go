@@ -177,11 +177,13 @@ func (u *ConversationUsecase) CreateConversation(ctx context.Context, conversati
 	ipAddress, err := u.ipRepo.GetIPAddress(ctx, remoteIP)
 	if err != nil {
 		u.logger.Warn("get ip address failed", log.Error(err), log.String("ip", remoteIP), log.String("conversation_id", conversation.ID))
-	} else {
+	} else if ipAddress != nil {
 		location := fmt.Sprintf("%s|%s|%s", ipAddress.Country, ipAddress.Province, ipAddress.City)
 		if err := u.geoCacheRepo.SetGeo(ctx, conversation.KBID, location); err != nil {
 			u.logger.Warn("set geo cache failed", log.Error(err), log.String("conversation_id", conversation.ID), log.String("ip", remoteIP))
 		}
+	} else {
+		u.logger.Warn("get ip address returned nil", log.String("ip", remoteIP), log.String("conversation_id", conversation.ID))
 	}
 	return nil
 }
