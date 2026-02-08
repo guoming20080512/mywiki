@@ -1,0 +1,63 @@
+services:
+  # 只保留本地构建的容器
+  nginx:
+    container_name: panda-wiki-nginx
+    depends_on:
+      - api
+    restart: always
+    build:
+      context: ./web/admin
+      dockerfile: Dockerfile
+    ports:
+      - 2443:8080
+    volumes:
+      - ./data/nginx/ssl:/etc/nginx/ssl
+    networks:
+      panda-wiki:
+        ipv4_address: "${SUBNET_PREFIX:-169.254.15}.111"
+  app:
+    container_name: panda-wiki-app
+    restart: always
+    build:
+      context: ./web/app
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3010
+    networks:
+      panda-wiki:
+        ipv4_address: "${SUBNET_PREFIX:-169.254.15}.112"
+  api:
+    container_name: panda-wiki-api
+    depends_on:
+      - postgres
+      - nats
+      - caddy
+      - raglite
+    restart: always
+    ports:
+    - 8000:8000 
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.api
+    volumes:
+      - ./data/caddy/run:/app/run
+      - ./data/nginx/ssl:/app/etc/nginx/ssl
+      - ./data/conf/api:/data
+    environment:
+      - NATS_PASSWORD=${NATS_PASSWORD}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - S3_SECRET_KEY=${S3_SECRET_KEY}
+      - JWT_SECRET=${JWT_SECRET}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - SUBNET_PREFIX=${SUBNET_PREFIX}
+    networks:
+      panda-wiki:
+        ipv4_address: "${SUBNET_PREFIX:-169.254.15}.2"
+
+networks:
+  panda-wiki:
+    ipam:
+      driver: default
+      config:
+        - subnet: "${SUBNET_PREFIX:-169.254.15}.0/24"
