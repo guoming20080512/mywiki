@@ -500,6 +500,9 @@ const AiQaContent: React.FC<{
               const { thinkingContent, answerContent } =
                 handleThinkingContent(newFullAnswer);
 
+              // 移除"本回答由 PandaWiki 基于 AI 生成，仅供参考"文本
+              const cleanedAnswerContent = answerContent.replace(/本回答由 PandaWiki 基于 AI 生成，仅供参考。/g, '').trim();
+
               // 更新状态
               if (newFullAnswer.includes('</think>')) {
                 setThinking(3);
@@ -513,7 +516,7 @@ const AiQaContent: React.FC<{
                 const lastConversation =
                   newConversation[newConversation.length - 1];
                 if (lastConversation) {
-                  lastConversation.a = answerContent;
+                  lastConversation.a = cleanedAnswerContent;
                   lastConversation.thinking_content = thinkingContent;
                   lastConversation.result_expend = lastResultExpendRef.current;
                   lastConversation.thinking_expend = false;
@@ -1045,9 +1048,7 @@ const AiQaContent: React.FC<{
                         </>
                       )}
                     </Stack>
-                    <Box>
-                      {kbDetail?.settings?.disclaimer_settings?.content}
-                    </Box>
+
                   </StyledActionStack>
                 )}
               </StyledAiBubble>
