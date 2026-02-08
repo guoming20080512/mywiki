@@ -33,14 +33,41 @@ func NewIPDB(config *config.Config, logger *log.Logger) (*IPDB, error) {
 }
 
 func (a *IPDB) Lookup(ip string) (*domain.IPAddress, error) {
+	var result *domain.IPAddress
+	defer func() {
+		if r := recover(); r != nil {
+			a.logger.Error("recover from ip search panic", log.Any("panic", r), log.String("ip", ip))
+			result = &domain.IPAddress{
+				IP:       ip,
+				Country:  "未知",
+				Province: "未知",
+				City:     "未知",
+			}
+		}
+	}()
+
 	region, err := a.searcher.SearchByStr(ip)
 	if err != nil {
-		return nil, fmt.Errorf("search ip failed: %w", err)
+		a.logger.Error("search ip failed", log.Error(err), log.String("ip", ip))
+		return &domain.IPAddress{
+			IP:       ip,
+			Country:  "未知",
+			Province: "未知",
+			City:     "未知",
+		}, nil
 	}
+
 	ipInfo := strings.Split(region, "|")
 	if len(ipInfo) != 5 {
-		return nil, fmt.Errorf("invalid ip info: %s", region)
+		a.logger.Error("invalid ip info", log.String("region", region), log.String("ip", ip))
+		return &domain.IPAddress{
+			IP:       ip,
+			Country:  "未知",
+			Province: "未知",
+			City:     "未知",
+		}, nil
 	}
+
 	country := ipInfo[0]
 	province := ipInfo[2]
 	city := ipInfo[3]
@@ -53,10 +80,13 @@ func (a *IPDB) Lookup(ip string) (*domain.IPAddress, error) {
 	if city == "0" {
 		city = "未知"
 	}
-	return &domain.IPAddress{
+
+	result = &domain.IPAddress{
 		IP:       ip,
 		Country:  country,
 		Province: province,
 		City:     city,
-	}, nil
+	}
+
+	return result, nil
 }
