@@ -4,7 +4,7 @@ import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
   distDir: 'dist',
   reactStrictMode: false,
-  allowedDevOrigins: ['10.10.18.71'],
+  allowedDevOrigins: ['10.10.18.71', '209.38.203.95'],
   output: 'standalone',
   assetPrefix: '/panda-wiki-app-assets',
   logging: {
