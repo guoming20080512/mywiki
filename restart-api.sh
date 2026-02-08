@@ -9,13 +9,28 @@ echo "1. 停止并移除现有 api 容器..."
 docker stop panda-wiki-api || true
 docker rm panda-wiki-api || true
 
-# 重新构建 api 容器
-echo "2. 重新构建 api 容器..."
-docker compose -f docker-compose.yml build api
+docker build -t panda-wiki-api -f ./backend/Dockerfile.api ./backend
 
-# 启动 api 容器
-echo "3. 启动 api 容器..."
-docker compose -f docker-compose.yml up -d api
+# 等待构建完成
+sleep 10
+
+docker run -d \
+  --name panda-wiki-api \
+  --network panda-wiki \
+  --ip ${SUBNET_PREFIX:-169.254.15}.2 \
+  -p 8000:8000 \
+  -v ./data/caddy/run:/app/run \
+  -v ./data/nginx/ssl:/app/etc/nginx/ssl \
+  -v ./data/conf/api:/data \
+  -e NATS_PASSWORD=$NATS_PASSWORD \
+  -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
+  -e REDIS_PASSWORD=$REDIS_PASSWORD \
+  -e S3_SECRET_KEY=$S3_SECRET_KEY \
+  -e JWT_SECRET=$JWT_SECRET \
+  -e ADMIN_PASSWORD=$ADMIN_PASSWORD \
+  -e SUBNET_PREFIX=${SUBNET_PREFIX:-169.254.15} \
+  panda-wiki-api
+
 
 # 检查启动状态
 echo "4. 检查 api 容器启动状态..."
