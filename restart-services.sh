@@ -190,18 +190,18 @@ docker run -d \
 echo "=== 启动前端服务 ==="
 
 # 5.1 构建前端应用
-cd ./web && NODE_OPTIONS="--max-old-space-size=4096" pnpm build
+cd ./web && NODE_OPTIONS="--max-old-space-size=8192" pnpm build
+
+# 等待构建完成
+sleep 20
+
+# 5.2 构建并启动 App 服务
+cd ./app && docker build -t panda-wiki-app .
 
 # 等待构建完成
 sleep 15
 
-# 5.2 构建并启动 App 服务
-docker build -t panda-wiki-app ./app
-
-# 等待构建完成
-sleep 10
-
-docker run -d \
+cd .. && docker run -d \
   --name panda-wiki-app \
   --network panda-wiki \
   --ip ${SUBNET_PREFIX:-169.254.15}.112 \
@@ -209,12 +209,12 @@ docker run -d \
   panda-wiki-app
 
 # 5.3 构建并启动 Nginx 服务
-docker build -t panda-wiki-nginx ./admin
+cd ./admin && docker build -t panda-wiki-nginx .
 
 # 等待构建完成
-sleep 5
+sleep 10
 
-docker run -d \
+cd ../.. && docker run -d \
   --name panda-wiki-nginx \
   --network panda-wiki \
   --ip ${SUBNET_PREFIX:-169.254.15}.111 \

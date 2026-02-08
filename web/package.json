@@ -7,7 +7,7 @@
     "preinstall": "npx only-allow pnpm",
     "icon": "pnpm --filter @panda-wiki/icons icon",
     "prepare": "cd ../ && husky web/.husky",
-    "build": "pnpm --parallel --filter admin --filter app build",
+    "build": "NODE_OPTIONS=--max-old-space-size=4096 pnpm --filter app build && NODE_OPTIONS=--max-old-space-size=12288 pnpm --filter admin build",
     "dev": "pnpm --parallel --filter admin --filter app dev"
   },
   "lint-staged": {
