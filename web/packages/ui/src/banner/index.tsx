@@ -417,8 +417,8 @@ const Banner = React.memo(
             <Stack
               direction='row'
               gap={{
-                xs: '16px 24px',
-                md: '16px 40px',
+                xs: '16px 16px',
+                md: '16px 20px',
               }}
               sx={{ mt: 5 }}
               flexWrap='wrap'
@@ -446,8 +446,8 @@ const Banner = React.memo(
                       md: 18,
                     },
                     px: {
-                      xs: 3,
-                      md: '69px',
+                      xs: 2,
+                      md: '32px',
                     },
                     py: {
                       xs: 1,

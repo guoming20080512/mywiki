@@ -1,6 +1,7 @@
 'use client';
 
 import Logo from '@/assets/images/logo.png';
+import BrandLogo from '@/assets/images/brand_logo.png';
 import { Stack, Box, IconButton, alpha, Tooltip } from '@mui/material';
 import { postShareProV1AuthLogout } from '@/request/pro/ShareAuth';
 import { IconDengchu } from '@panda-wiki/icons';
@@ -72,6 +73,7 @@ const Header = ({ isDocPage = false, isWelcomePage = false }: HeaderProps) => {
     catalogWidth,
     setQaModalOpen,
     authInfo,
+    themeMode,
   } = useStore();
   const basePath = useBasePath();
   const docWidth = useMemo(() => {
@@ -96,7 +98,7 @@ const Header = ({ isDocPage = false, isWelcomePage = false }: HeaderProps) => {
       mobile={mobile}
       docWidth={docWidth}
       catalogWidth={catalogWidth}
-      logo={getImagePath(kbDetail?.settings?.icon || Logo.src, basePath)}
+      logo={getImagePath(isWelcomePage ? BrandLogo.src : (themeMode === 'dark' ? BrandLogo.src : Logo.src), basePath)}
       title={kbDetail?.settings?.title}
       placeholder={
         kbDetail?.settings?.web_app_custom_style?.header_search_placeholder
@@ -147,7 +149,7 @@ export const WelcomeHeader = () => {
       mobile={mobile}
       docWidth='full'
       catalogWidth={catalogWidth}
-      logo={getImagePath(kbDetail?.settings?.icon || Logo.src, basePath)}
+      logo={getImagePath(BrandLogo.src, basePath)}
       title={kbDetail?.settings?.title}
       placeholder={
         kbDetail?.settings?.web_app_custom_style?.header_search_placeholder
