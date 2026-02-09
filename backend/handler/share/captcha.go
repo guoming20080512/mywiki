@@ -45,10 +45,7 @@ func NewShareCaptchaHandler(
 //	@Success		200		{object}	gocap.ChallengeData
 //	@Router			/share/v1/captcha/challenge [post]
 func (h *ShareCaptchaHandler) CreateCaptcha(c echo.Context) error {
-	kbID := c.Request().Header.Get("X-KB-ID")
-	if kbID == "" {
-		return h.NewResponseWithError(c, "kb_id is required", nil)
-	}
+	// 验证码生成不依赖知识库ID，移除强制要求
 	data, err := h.Captcha.CreateChallenge(c.Request().Context())
 	if err != nil {
 		return h.NewResponseWithError(c, "create captcha failed", err)
@@ -68,10 +65,7 @@ func (h *ShareCaptchaHandler) CreateCaptcha(c echo.Context) error {
 //	@Success		200		{object}	gocap.VerificationResult
 //	@Router			/share/v1/captcha/redeem [post]
 func (h *ShareCaptchaHandler) RedeemCaptcha(c echo.Context) error {
-	kbID := c.Request().Header.Get("X-KB-ID")
-	if kbID == "" {
-		return h.NewResponseWithError(c, "kb_id is required", nil)
-	}
+	// 验证码验证不依赖知识库ID，移除强制要求
 	var req consts.RedeemCaptchaReq
 	if err := c.Bind(&req); err != nil {
 		return h.NewResponseWithError(c, "request is invalid", err)
