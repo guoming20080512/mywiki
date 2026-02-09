@@ -38,7 +38,7 @@ http {
     server {
         listen 80 default_server;
         listen [::]:80 default_server;
-        server_name www.cryptobtc.xin localhost;
+        server_name www.cryptobtc.xin;
         charset utf-8;
         
         location / {
@@ -128,7 +128,7 @@ http {
     server {
         listen 2443;
         listen [::]:2443;
-        server_name localhost;
+        server_name superme.cryptobtc.xin;
         charset utf-8;
         
         location / {
@@ -192,12 +192,14 @@ echo "\n✓ nginx 完整配置完成！"
 echo "参考了项目中的配置文件，包含了所有必要的代理规则。"
 echo "\n服务访问地址:"
 echo "- 前端网站: http://www.cryptobtc.xin/"
-echo "- 前端网站: http://localhost/"
-echo "- Admin 管理后台: http://localhost:2443/"
+echo "- Admin 管理后台: http://superme.cryptobtc.xin:2443/"
 echo "\n反向代理配置:"
 echo "- 80 端口 → http://127.0.0.1:3001 (前端网站)"
 echo "- 2443 端口 → http://127.0.0.1:2443 (Admin 管理后台)"
 echo "- API 请求 → http://127.0.0.1:8000 (后端 API)"
 echo "- 静态文件 → http://127.0.0.1:9000 (MinIO)"
+echo "\n域名配置:"
+echo "- 前端网站域名: www.cryptobtc.xin"
+echo "- Admin 管理后台域名: superme.cryptobtc.xin"
 echo "\n配置文件位置: /etc/nginx/nginx.conf"
 echo "备份文件位置: /etc/nginx/nginx.conf.bak"
