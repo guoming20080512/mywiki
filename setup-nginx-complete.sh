@@ -236,6 +236,7 @@ server {
         proxy_buffering off;
     }
 }
+}
 EOF
 
 # 3. 创建必要的目录
