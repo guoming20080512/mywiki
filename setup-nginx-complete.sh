@@ -34,135 +34,206 @@ http {
     keepalive_timeout 65;
     gzip on;
     
-    # 前端网站反向代理
-    server {
-        listen 80 default_server;
-        listen [::]:80 default_server;
-        server_name www.cryptobtc.xin;
-        charset utf-8;
-        
-        location / {
-            proxy_pass http://127.0.0.1:3001;
-            proxy_http_version 1.1;
-            proxy_set_header Upgrade $http_upgrade;
-            proxy_set_header Connection "upgrade";
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
-            proxy_cache_bypass $http_upgrade;
-        }
-        
-        # API 代理（如果前端需要直接访问 API）
-        location ~ ^/api {
-            proxy_pass http://127.0.0.1:8000;
-            client_max_body_size 1000m;
-            proxy_http_version 1.1;
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
-        }
-        
-        # 分享 API 代理
-        location ~ ^/share {
-            proxy_pass http://127.0.0.1:8000;
-            proxy_http_version 1.1;
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
-        }
-        
-        # 静态文件代理
-        location ~ ^/static-file/ {
-            proxy_pass http://127.0.0.1:9000;
-            proxy_connect_timeout 300;
-            proxy_send_timeout 300;
-            proxy_read_timeout 300;
-            send_timeout 300;
-            client_max_body_size 1000m;
-            
-            if ($request_uri !~* \.pdf$) {
-                add_header Content-Disposition "attachment" always;
-            }
-            
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
-            proxy_set_header Host $host;
-            
-            proxy_cache off;
-            proxy_buffering off;
-        }
-        
-        # 聊天消息代理（需要特殊配置）
-        location ~ ^/(share/v1/chat/message|api/v1/creation/text) {
-            proxy_pass http://127.0.0.1:8000;
-            proxy_http_version 1.1;
-            chunked_transfer_encoding off;
-            proxy_buffering off;
-            proxy_cache off;
-            proxy_read_timeout 24h;
-            proxy_send_timeout 24h;
-            
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
-            proxy_set_header Host $host;
-        }
-        
-        # 文件上传代理（需要大文件支持）
-        location = /api/v1/file/upload {
-            proxy_pass http://127.0.0.1:8000;
-            client_max_body_size 1000m;
-            
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
-            proxy_set_header Host $host;
-        }
+upstream backend {
+    server 127.0.0.1:8000;
+}
+
+# 前端网站反向代理
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    server_name www.cryptobtc.xin;
+    charset utf-8;
+       
+    # 聊天消息代理（需要特殊配置）
+    location ~ ^/(share/v1/chat/message|api/v1/creation/text) {
+        proxy_set_header Connection '';
+        proxy_http_version 1.1;
+        chunked_transfer_encoding off;
+        proxy_buffering off;
+        proxy_cache off;
+
+        proxy_read_timeout 24h;
+        proxy_send_timeout 24h;
+
+        # Forward client information
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Host $http_host;
+
+        proxy_pass http://backend;
     }
     
-    # Admin 管理后台反向代理
-    server {
-        listen 2443;
-        listen [::]:2443;
-        server_name superme.cryptobtc.xin;
-        charset utf-8;
-        
-        location / {
-            proxy_pass http://127.0.0.1:2443;
-            proxy_http_version 1.1;
-            proxy_set_header Upgrade $http_upgrade;
-            proxy_set_header Connection "upgrade";
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
-            proxy_cache_bypass $http_upgrade;
+    # 文件上传代理（需要大文件支持）
+    location = /api/v1/file/upload {
+        proxy_pass http://backend;
+
+        client_max_body_size 1000m;
+
+        # Forward client information
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Host $http_host;
+    }
+    
+    # API 代理
+    location ~ ^/api {
+        proxy_pass http://backend;
+
+        client_max_body_size 1000m;
+
+        # Forward client information
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Host $http_host;
+    }
+    
+    # 分享 API 代理
+    location ~ ^/share {
+        proxy_pass http://backend;
+
+        # Forward client information
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Host $http_host;
+    }
+    
+    # 静态文件代理
+    location ~ ^/static-file/ {
+        proxy_pass http://127.0.0.1:9000;
+
+        proxy_connect_timeout 300;
+        proxy_send_timeout 300;
+        proxy_read_timeout 300;
+        send_timeout 300;
+
+        client_max_body_size 1000m;
+
+        if ($request_uri !~* \.pdf$) {
+            add_header Content-Disposition "attachment" always;
         }
-        
-        # Admin API 代理
-        location ~ ^/api {
-            proxy_pass http://127.0.0.1:8000;
-            client_max_body_size 1000m;
-            proxy_http_version 1.1;
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
+
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Host $http_host;
+
+        proxy_cache off;
+        proxy_buffering off;
+    }
+
+     location / {
+        root /data/wiki/mywiki/web/app/dist;
+        index index.html index.htm;
+        try_files $uri $uri/ $uri.html /index.html;
+        if ($request_filename ~* .*\.(htm|html)$) {
+            add_header Cache-Control "no-cache";
         }
-        
-        # Admin 分享 API 代理
-        location ~ ^/share {
-            proxy_pass http://127.0.0.1:8000;
-            proxy_http_version 1.1;
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+    
+# Admin 管理后台反向代理
+server {
+    listen 2443;
+    listen [::]:2443;
+    server_name superme.cryptobtc.xin;
+    charset utf-8;
+    
+    location / {
+        proxy_pass http://127.0.0.1:2443;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+    }
+    
+    # 聊天消息代理（需要特殊配置）
+    location ~ ^/(share/v1/chat/message|api/v1/creation/text) {
+        proxy_set_header Connection '';
+        proxy_http_version 1.1;
+        chunked_transfer_encoding off;
+        proxy_buffering off;
+        proxy_cache off;
+
+        proxy_read_timeout 24h;
+        proxy_send_timeout 24h;
+
+        # Forward client information
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Host $http_host;
+
+        proxy_pass http://backend;
+    }
+    
+    # 文件上传代理（需要大文件支持）
+    location = /api/v1/file/upload {
+        proxy_pass http://backend;
+
+        client_max_body_size 1000m;
+
+        # Forward client information
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Host $http_host;
+    }
+    
+    # Admin API 代理
+    location ~ ^/api {
+        proxy_pass http://backend;
+
+        client_max_body_size 1000m;
+
+        # Forward client information
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Host $http_host;
+    }
+    
+    # Admin 分享 API 代理
+    location ~ ^/share {
+        proxy_pass http://backend;
+
+        # Forward client information
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Host $http_host;
+    }
+    
+    # 静态文件代理
+    location ~ ^/static-file/ {
+        proxy_pass http://127.0.0.1:9000;
+
+        proxy_connect_timeout 300;
+        proxy_send_timeout 300;
+        proxy_read_timeout 300;
+        send_timeout 300;
+
+        client_max_body_size 1000m;
+
+        if ($request_uri !~* \.pdf$) {
+            add_header Content-Disposition "attachment" always;
         }
+
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Host $http_host;
+
+        proxy_cache off;
+        proxy_buffering off;
     }
 }
 EOF
