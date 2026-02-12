@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "start": "serve -s dist -l 2443",
+    "start": "npx serve -s dist -l 2443",
     "build:dev": "vite build --m development",
     "build": "NODE_OPTIONS=\"--max-old-space-size=8192\" tsc -b && NODE_OPTIONS=\"--max-old-space-size=8192\" vite build",
     
