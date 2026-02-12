@@ -45,20 +45,20 @@ export async function generateMetadata(): Promise<Metadata> {
   const basePath = getBasePath(kbDetail?.base_url || '');
   const icon = getImagePath(kbDetail?.settings?.icon || '', basePath);
   
-  // 使用cryptobtc作为网站名称，添加描述性内容
-  const title = 'cryptobtc - 加密资产百科全书 | Crypto Wiki';
+  // 使用cryptobtc作为网站名称，添加描述性内容和服务地区信息
+  const title = 'cryptobtc - 加密资产百科全书 | 仅服务中国香港和中国澳门用户';
   
   return {
     metadataBase: new URL(process.env.TARGET || ''),
     title,
-    description: 'cryptobtc是专注于加密资产的百科全书，提供全面的区块链和数字货币知识，包括比特币、以太坊等加密货币的详细介绍和技术解析。',
-    keywords: 'cryptobtc,加密资产,区块链,数字货币,百科全书,wiki,crypto,bitcoin',
+    description: 'cryptobtc是专注于加密资产的百科全书，提供全面的区块链和数字货币知识，包括比特币、以太坊等加密货币的详细介绍和技术解析。仅服务中国香港和中国澳门用户。',
+    keywords: 'cryptobtc,加密资产,区块链,数字货币,百科全书,wiki,crypto,bitcoin,香港,澳门',
     icons: {
       icon: icon || `${basePath}/favicon.png`,
     },
     openGraph: {
       title,
-      description: 'cryptobtc是专注于加密资产的百科全书，提供全面的区块链和数字货币知识，包括比特币、以太坊等加密货币的详细介绍和技术解析。',
+      description: 'cryptobtc是专注于加密资产的百科全书，提供全面的区块链和数字货币知识，包括比特币、以太坊等加密货币的详细介绍和技术解析。仅服务中国香港和中国澳门用户。',
       images: icon ? [icon] : [],
     },
   };
