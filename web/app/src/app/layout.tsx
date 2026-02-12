@@ -129,7 +129,7 @@ const Layout = async ({
                   本网站 仅限中国香港、中国澳门地区用户 使用，仅提供区块链及加密资产相关技术科普内容，不面向其他地区提供服务。
                 </Box>
                 {error ? <ErrorComponent error={error} /> : children}
-                <Box sx={{ bgcolor: '#FFF3CD', color: '#856404', py: 1, px: 3, textAlign: 'center', borderTop: '1px solid #FFEAA7', fontSize: 14, mt: 4 }}>
+                <Box sx={{ bgcolor: '#FFF3CD', color: '#856404', py: 1, px: 3, textAlign: 'center', borderTop: '1px solid #FFEAA7', fontSize: 14 }}>
                   本网站 仅限中国香港、中国澳门地区用户 使用，仅提供区块链及加密资产相关技术科普内容，不面向其他地区提供服务。
                 </Box>
               </Box>
