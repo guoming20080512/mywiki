@@ -2,8 +2,6 @@ import { getShareV1NodeDetail } from '@/request/ShareNode';
 import { formatMeta } from '@/utils';
 import Doc from '@/views/node';
 import { ResolvingMetadata } from 'next';
-import { Box, Stack } from '@mui/material';
-import { IconWenjian, IconWenjianjia } from '@panda-wiki/icons';
 
 export interface PageProps {
   params: Promise<{ id: string }>;
@@ -44,34 +42,24 @@ const DocPage = async ({ params }: PageProps) => {
     error = err;
   }
   return (
-    <Box>
+    <>
       {node && (
         <h1
           style={{
-            margin: 0,
-            padding: 0,
-            fontSize: '30px',
-            lineHeight: '36px',
-            fontWeight: 'bold',
-            color: 'inherit',
-            marginBottom: '10px',
-            display: 'flex',
-            alignItems: 'flex-start',
-            gap: '8px',
+            position: 'absolute',
+            top: '-9999px',
+            left: '-9999px',
+            width: '1px',
+            height: '1px',
+            overflow: 'hidden',
+            clip: 'rect(0, 0, 0, 0)',
           }}
         >
-          {node?.meta?.emoji ? (
-            <Box style={{ flexShrink: 0 }}>{node?.meta?.emoji}</Box>
-          ) : node?.type === 1 ? (
-            <IconWenjianjia style={{ flexShrink: 0, marginTop: '2px' }} />
-          ) : (
-            <IconWenjian style={{ flexShrink: 0, marginTop: '2px' }} />
-          )}
           {node?.name}
         </h1>
       )}
       <Doc node={node} error={error} />
-    </Box>
+    </>
   );
 };
 

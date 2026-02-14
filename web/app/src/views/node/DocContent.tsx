@@ -217,27 +217,34 @@ const DocContent = ({
         }),
       })}
     >
-      <Stack
-        direction={'row'}
-        alignItems={'flex-start'}
-        gap={1}
-        sx={{
-          fontSize: 30,
-          lineHeight: '36px',
-          fontWeight: 'bold',
-          color: 'text.primary',
-          mb: '10px',
+      <h2
+        style={{
+          margin: 0,
+          padding: 0,
         }}
       >
-        {info?.meta?.emoji ? (
-          <Box sx={{ flexShrink: 0 }}>{info?.meta?.emoji}</Box>
-        ) : info?.type === 1 ? (
-          <IconWenjianjia sx={{ flexShrink: 0, mt: 0.5 }} />
-        ) : (
-          <IconWenjian sx={{ flexShrink: 0, mt: 0.5 }} />
-        )}
-        {info?.name}
-      </Stack>
+        <Stack
+          direction={'row'}
+          alignItems={'flex-start'}
+          gap={1}
+          sx={{
+            fontSize: 30,
+            lineHeight: '36px',
+            fontWeight: 'bold',
+            color: 'text.primary',
+            mb: '10px',
+          }}
+        >
+          {info?.meta?.emoji ? (
+            <Box sx={{ flexShrink: 0 }}>{info?.meta?.emoji}</Box>
+          ) : info?.type === 1 ? (
+            <IconWenjianjia sx={{ flexShrink: 0, mt: 0.5 }} />
+          ) : (
+            <IconWenjian sx={{ flexShrink: 0, mt: 0.5 }} />
+          )}
+          {info?.name}
+        </Stack>
+      </h2>
       <Stack
         direction='row'
         justifyContent='space-between'
