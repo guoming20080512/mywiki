@@ -44,19 +44,35 @@ const DocPage = async ({ params }: PageProps) => {
   return (
     <>
       {node && (
-        <h1
-          style={{
-            position: 'absolute',
-            top: '-9999px',
-            left: '-9999px',
-            width: '1px',
-            height: '1px',
-            overflow: 'hidden',
-            clip: 'rect(0, 0, 0, 0)',
-          }}
-        >
-          {node?.name}
-        </h1>
+        <>
+          <h1
+            style={{
+              position: 'absolute',
+              top: '-9999px',
+              left: '-9999px',
+              width: '1px',
+              height: '1px',
+              overflow: 'hidden',
+              clip: 'rect(0, 0, 0, 0)',
+            }}
+          >
+            {node?.name}
+          </h1>
+          {node.type === 2 && node.content && (
+            <div
+              style={{
+                position: 'absolute',
+                top: '-9999px',
+                left: '-9999px',
+                width: '1px',
+                height: '1px',
+                overflow: 'hidden',
+                clip: 'rect(0, 0, 0, 0)',
+              }}
+              dangerouslySetInnerHTML={{ __html: node.content }}
+            />
+          )}
+        </>
       )}
       <Doc node={node} error={error} />
     </>
