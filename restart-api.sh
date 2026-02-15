@@ -3,6 +3,14 @@
 # 重启 PandaWiki API 容器脚本
 
 echo "正在重启 PandaWiki API 容器..."
+  
+# 加载环境变量
+if [ -f .env ]; then
+  echo "正在加载环境变量..."
+  export $(cat .env | grep -v '^#' | xargs)
+else
+  echo "警告: .env 文件不存在，使用默认环境变量"
+fi
 
 # 停止并移除 api 容器
 echo "1. 停止并移除现有 api 容器..."
