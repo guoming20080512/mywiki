@@ -84,6 +84,10 @@ func (h *ShareChatHandler) ChatMessage(c echo.Context) error {
 		return h.sendErrMsg(c, "parse request failed")
 	}
 	req.KBID = c.Request().Header.Get("X-KB-ID") // get from caddy header
+	if req.KBID == "" {
+		req.KBID = "56c9daf6-88ee-4c15-9516-a9f5bcb030c4"
+		h.logger.Info("using default kb_id", log.String("kb_id", req.KBID))
+	}
 	if err := c.Validate(&req); err != nil {
 		h.logger.Error("validate request failed", log.Error(err))
 		return h.sendErrMsg(c, "validate request failed")
@@ -157,6 +161,10 @@ func (h *ShareChatHandler) ChatWidget(c echo.Context) error {
 		return h.sendErrMsg(c, "parse request failed")
 	}
 	req.KBID = c.Request().Header.Get("X-KB-ID") // get from caddy header
+	if req.KBID == "" {
+		req.KBID = "56c9daf6-88ee-4c15-9516-a9f5bcb030c4"
+		h.logger.Info("using default kb_id", log.String("kb_id", req.KBID))
+	}
 	if err := c.Validate(&req); err != nil {
 		h.logger.Error("validate request failed", log.Error(err))
 		return h.sendErrMsg(c, "validate request failed")
@@ -272,7 +280,8 @@ func (h *ShareChatHandler) ChatCompletions(c echo.Context) error {
 	// get kb id from header
 	kbID := c.Request().Header.Get("X-KB-ID")
 	if kbID == "" {
-		return h.sendOpenAIError(c, "X-KB-ID header is required", "invalid_request_error")
+		kbID = "56c9daf6-88ee-4c15-9516-a9f5bcb030c4"
+		h.logger.Info("using default kb_id", log.String("kb_id", kbID))
 	}
 
 	if err := c.Validate(&req); err != nil {
@@ -481,6 +490,10 @@ func (h *ShareChatHandler) ChatSearch(c echo.Context) error {
 		return h.NewResponseWithError(c, "parse request failed", err)
 	}
 	req.KBID = c.Request().Header.Get("X-KB-ID") // get from caddy header
+	if req.KBID == "" {
+		req.KBID = "56c9daf6-88ee-4c15-9516-a9f5bcb030c4"
+		h.logger.Info("using default kb_id", log.String("kb_id", req.KBID))
+	}
 	if err := c.Validate(&req); err != nil {
 		return h.NewResponseWithError(c, "validate request failed", err)
 	}
@@ -525,6 +538,10 @@ func (h *ShareChatHandler) WidgetSearch(c echo.Context) error {
 		return h.NewResponseWithError(c, "parse request failed", err)
 	}
 	req.KBID = c.Request().Header.Get("X-KB-ID")
+	if req.KBID == "" {
+		req.KBID = "56c9daf6-88ee-4c15-9516-a9f5bcb030c4"
+		h.logger.Info("using default kb_id", log.String("kb_id", req.KBID))
+	}
 	if err := c.Validate(&req); err != nil {
 		return h.NewResponseWithError(c, "validate request failed", err)
 	}

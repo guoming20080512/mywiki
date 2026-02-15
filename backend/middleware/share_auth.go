@@ -28,11 +28,8 @@ func (h *ShareAuthMiddleware) CheckForbidden(next echo.HandlerFunc) echo.Handler
 	return func(c echo.Context) error {
 		kbID := c.Request().Header.Get("X-KB-ID")
 		if kbID == "" {
-			h.logger.Error("kb_id is empty")
-			return c.JSON(http.StatusBadRequest, domain.PWResponse{
-				Success: false,
-				Message: "kb_id is required",
-			})
+			kbID = "56c9daf6-88ee-4c15-9516-a9f5bcb030c4"
+			h.logger.Info("using default kb_id", log.String("kb_id", kbID))
 		}
 
 		kb, err := h.kbUsecase.GetKnowledgeBase(c.Request().Context(), kbID)
@@ -61,11 +58,8 @@ func (h *ShareAuthMiddleware) Authorize(next echo.HandlerFunc) echo.HandlerFunc 
 	return func(c echo.Context) error {
 		kbID := c.Request().Header.Get("X-KB-ID")
 		if kbID == "" {
-			h.logger.Error("kb_id is empty")
-			return c.JSON(http.StatusUnauthorized, domain.PWResponse{
-				Success: false,
-				Message: "Unauthorized",
-			})
+			kbID = "56c9daf6-88ee-4c15-9516-a9f5bcb030c4"
+			h.logger.Info("using default kb_id", log.String("kb_id", kbID))
 		}
 
 		kb, err := h.kbUsecase.GetKnowledgeBase(c.Request().Context(), kbID)
