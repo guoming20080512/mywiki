@@ -11,6 +11,7 @@ import { Box, Checkbox, Stack, TextField } from '@mui/material';
 import dayjs from 'dayjs';
 import { useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import indexNowService from '@/services/indexNowService';
 
 interface VersionPublishProps {
   open: boolean;
@@ -70,6 +71,26 @@ const VersionPublish = ({
         node_ids: [...selected, ...folderIds],
       }).then(() => {
         message.success(`${data.tag} 版本发布成功`);
+        
+        // 提交到IndexNow
+        const documentUrls = indexNowService.buildDocumentUrls(selected);
+        if (documentUrls.length > 0) {
+          indexNowService.submitUrls(documentUrls).then(results => {
+            console.log('IndexNow submission results:', results);
+            // 统计成功和失败的数量
+            const successCount = results.filter(r => r.success).length;
+            const failCount = results.filter(r => !r.success).length;
+            
+            if (failCount === 0) {
+              console.log(`所有 ${documentUrls.length} 个文档URL已成功提交到IndexNow`);
+            } else {
+              console.warn(`IndexNow提交结果: 成功 ${successCount} 个, 失败 ${failCount} 个`);
+            }
+          }).catch(error => {
+            console.error('IndexNow提交失败:', error);
+          });
+        }
+        
         reset();
         setSelected([]);
         onClose();
