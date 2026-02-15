@@ -161,7 +161,7 @@ func NewConfig() (*Config, error) {
 // overrideWithEnv override sensitive info with env variables
 func overrideWithEnv(c *Config) {
 	if env := os.Getenv("POSTGRES_PASSWORD"); env != "" {
-		c.PG.DSN = fmt.Sprintf("host=panda-wiki-postgres user=panda-wiki password=%s dbname=panda-wiki port=5432 sslmode=disable TimeZone=Asia/Shanghai", env)
+		c.PG.DSN = fmt.Sprintf("host=209.38.203.95 user=panda-wiki password=%s dbname=panda-wiki port=5432 sslmode=disable TimeZone=Asia/Shanghai", env)
 	}
 	if env := os.Getenv("NATS_PASSWORD"); env != "" {
 		c.MQ.NATS.Password = env
