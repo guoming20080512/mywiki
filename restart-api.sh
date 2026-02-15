@@ -9,7 +9,7 @@ echo "1. 停止并移除现有 api 容器..."
 docker stop wiki-api || true
 docker rm wiki-api || true
 
-docker build -t api -f ./backend/Dockerfile.api ./backend
+docker build -t  wiki-api -f ./backend/Dockerfile.api ./backend
 
 # 等待构建完成
 sleep 10
