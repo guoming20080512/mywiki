@@ -6,16 +6,16 @@ echo "正在重启 PandaWiki API 容器..."
 
 # 停止并移除 api 容器
 echo "1. 停止并移除现有 api 容器..."
-docker stop panda-wiki-api || true
-docker rm panda-wiki-api || true
+docker stop wiki-api || true
+docker rm wiki-api || true
 
-docker build -t panda-wiki-api -f ./backend/Dockerfile.api ./backend
+docker build -t api -f ./backend/Dockerfile.api ./backend
 
 # 等待构建完成
 sleep 10
 
 docker run -d \
-  --name panda-wiki-api \
+  --name wiki-api \
   --network panda-wiki \
   --ip ${SUBNET_PREFIX:-169.254.15}.2 \
   -p 8000:8000 \
@@ -29,16 +29,16 @@ docker run -d \
   -e JWT_SECRET=$JWT_SECRET \
   -e ADMIN_PASSWORD=$ADMIN_PASSWORD \
   -e SUBNET_PREFIX=${SUBNET_PREFIX:-169.254.15} \
-  panda-wiki-api
+  wiki-api
 
 
 # 检查启动状态
 echo "4. 检查 api 容器启动状态..."
 sleep 3
-docker ps -a | grep panda-wiki-api
+docker ps -a | grep wiki-api
 
 echo "5. 查看 api 容器日志..."
-docker logs -f panda-wiki-api --tail 50
+docker logs -f wiki-api --tail 50
 
 # 退出脚本
 exit 0
