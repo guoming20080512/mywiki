@@ -9,6 +9,7 @@ import { getShareV1NodeList } from '@/request/ShareNode';
 import { getShareV1AppWebInfo } from '@/request/ShareApp';
 import { filterEmptyFolders, convertToTree } from '@/utils/drag';
 import { deepSearchFirstNode } from '@/utils';
+import { requestTimer } from '@/utils/requestTimer';
 
 const StatPage = {
   welcome: 1,
@@ -18,13 +19,19 @@ const StatPage = {
 } as const;
 
 const getFirstNode = async (kbId: string) => {
-  const nodeListResult: any = await getShareV1NodeList({ headers: { 'x-kb-id': kbId } });
+  const nodeListResult: any = await requestTimer(
+    'getShareV1NodeList',
+    () => getShareV1NodeList({ headers: { 'x-kb-id': kbId } })
+  );
   const tree = filterEmptyFolders(convertToTree(nodeListResult || []));
   return deepSearchFirstNode(tree);
 };
 
 const getHomePath = async (kbId: string) => {
-  const info = await getShareV1AppWebInfo({ headers: { 'x-kb-id': kbId } });
+  const info = await requestTimer(
+    'getShareV1AppWebInfo',
+    () => getShareV1AppWebInfo({ headers: { 'x-kb-id': kbId } })
+  );
   return info?.settings?.home_page_setting;
 };
 
@@ -56,17 +63,20 @@ const homeProxy = async (
     // 页面上报
     const pages = Object.keys(StatPage);
     if (pages.includes(page) || pages.includes(id)) {
-      postShareV1StatPage(
-        {
-          scene: StatPage[page as keyof typeof StatPage],
-          node_id: id || '',
-        },
-        {
-          headers: {
-            'x-pw-session-id': session,
-            ...headers,
+      requestTimer(
+        'postShareV1StatPage',
+        () => postShareV1StatPage(
+          {
+            scene: StatPage[page as keyof typeof StatPage],
+            node_id: id || '',
           },
-        },
+          {
+            headers: {
+              'x-pw-session-id': session,
+              ...headers,
+            },
+          },
+        )
       );
     }
 
@@ -125,7 +135,10 @@ export async function proxy(request: NextRequest) {
   const pathname = url.pathname;
   if (pathname.startsWith('/widget')) {
     const kbId = request.headers.get('x-kb-id') || process.env.DEV_KB_ID || '';
-    const widgetInfo: any = await getShareV1AppWidgetInfo({ headers: { 'x-kb-id': kbId } });
+    const widgetInfo: any = await requestTimer(
+      'getShareV1AppWidgetInfo',
+      () => getShareV1AppWidgetInfo({ headers: { 'x-kb-id': kbId } })
+    );
     if (widgetInfo) {
       if (!widgetInfo?.settings?.widget_bot_settings?.is_open) {
         return NextResponse.rewrite(new URL('/not-found', request.url));

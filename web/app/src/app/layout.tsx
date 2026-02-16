@@ -3,6 +3,8 @@ import StoreProvider from '@/provider';
 import { ThemeStoreProvider } from '@/provider/themeStore';
 import { getShareV1AppWebInfo } from '@/request/ShareApp';
 import { getShareProV1AuthInfo } from '@/request/pro/ShareAuth';
+import { requestTimer } from '@/utils/requestTimer';
+
 import Script from 'next/script';
 import { Box } from '@mui/material';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v16-appRouter';
@@ -41,7 +43,10 @@ export const viewport: Viewport = {
 
 export async function generateMetadata(): Promise<Metadata> {
   const serverHeaders = await getServerHeader();
-  const kbDetail: any = await getShareV1AppWebInfo({ headers: serverHeaders });
+  const kbDetail: any = await requestTimer(
+    'getShareV1AppWebInfo (metadata)',
+    () => getShareV1AppWebInfo({ headers: serverHeaders })
+  );
   const basePath = getBasePath(kbDetail?.base_url || '');
   const icon = getImagePath(kbDetail?.settings?.icon || '', basePath);
   
@@ -81,8 +86,14 @@ const Layout = async ({
   const serverHeaders = await getServerHeader();
   
   const [kbDetailResolve, authInfoResolve] = await Promise.allSettled([
-    getShareV1AppWebInfo({ headers: serverHeaders }),
-    getShareProV1AuthInfo({ headers: serverHeaders }),
+    requestTimer(
+      'getShareV1AppWebInfo (layout)',
+      () => getShareV1AppWebInfo({ headers: serverHeaders })
+    ),
+    requestTimer(
+      'getShareProV1AuthInfo',
+      () => getShareProV1AuthInfo({ headers: serverHeaders })
+    ),
   ]);
 
   const authInfo: any =
