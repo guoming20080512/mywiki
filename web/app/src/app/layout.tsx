@@ -2,7 +2,6 @@ import ErrorComponent from '@/components/error';
 import StoreProvider from '@/provider';
 import { ThemeStoreProvider } from '@/provider/themeStore';
 import { getShareV1AppWebInfo } from '@/request/ShareApp';
-import { getShareProV1AuthInfo } from '@/request/pro/ShareAuth';
 import { requestTimer } from '@/utils/requestTimer';
 
 import Script from 'next/script';
@@ -85,28 +84,15 @@ const Layout = async ({
 
   const serverHeaders = await getServerHeader();
   
-  const [kbDetailResolve, authInfoResolve] = await Promise.allSettled([
+  const [kbDetailResolve] = await Promise.allSettled([
     requestTimer(
       'getShareV1AppWebInfo (layout)',
       () => getShareV1AppWebInfo({ headers: serverHeaders })
     ),
-    requestTimer(
-      'getShareProV1AuthInfo',
-      () => getShareProV1AuthInfo({ headers: serverHeaders })
-    ),
   ]);
 
-  const authInfo: any =
-    authInfoResolve.status === 'fulfilled' ? authInfoResolve.value : undefined;
   const kbDetail: any =
     kbDetailResolve.status === 'fulfilled' ? kbDetailResolve.value : undefined;
-
-  if (
-    authInfoResolve.status === 'rejected' &&
-    authInfoResolve.reason.code === 403
-  ) {
-    error = authInfoResolve.reason;
-  }
 
   const { isMobile } = getSelectorsByUserAgent(userAgent || '') || {
     isMobile: false,
@@ -131,7 +117,6 @@ const Layout = async ({
               kbDetail={kbDetail}
               themeMode={themeMode || 'light'}
               mobile={isMobile}
-              authInfo={authInfo}
             >
               <Box
                 sx={{

@@ -16,6 +16,7 @@ import {
   getServerPathname,
   getServerSearch,
 } from "@/utils/getServerHeader";
+import { requestTimer } from "@/utils/requestTimer";
 import { message as alert } from "@ctzhian/ui";
 import { redirect } from "next/navigation";
 export type QueryParamsType = Record<string | number, any>;
@@ -226,42 +227,44 @@ export class HttpClient<SecurityDataType = unknown> {
   }: FullRequestParams & { isAlert?: boolean }): Promise<
     ExtractDataProp<T>
   > => {
-    const secureParams =
-      ((typeof secure === "boolean" ? secure : this.baseApiParams.secure) &&
-        this.securityWorker &&
-        (await this.securityWorker(this.securityData))) ||
-      {};
-    const requestParams = this.mergeRequestParams(params, secureParams);
-    const queryString = query && this.toQueryString(query);
-    const payloadFormatter = this.contentFormatters[type || ContentType.Json];
-    const responseFormat = format || requestParams.format || "json";
+    return requestTimer(`API: ${path}`, async () => {
+      const secureParams =
+        ((typeof secure === "boolean" ? secure : this.baseApiParams.secure) &&
+          this.securityWorker &&
+          (await this.securityWorker(this.securityData))) ||
+        {};
+      const requestParams = this.mergeRequestParams(params, secureParams);
+      const queryString = query && this.toQueryString(query);
+      const payloadFormatter = this.contentFormatters[type || ContentType.Json];
+      const responseFormat = format || requestParams.format || "json";
 
-    let customHeaders = {};
-    if (typeof window === "undefined") {
-      customHeaders = await getServerHeader();
-    }
+      let customHeaders = {};
+      if (typeof window === "undefined") {
+        customHeaders = await getServerHeader();
+      }
 
-    return this.customFetch(
-      `${baseUrl || this.baseUrl || (typeof window !== "undefined" ? window._BASE_PATH_ : "")}${path}${queryString ? `?${queryString}` : ""}`,
-      {
-        ...requestParams,
-        headers: {
-          ...customHeaders,
-          ...(requestParams.headers || {}),
-          ...(type && type !== ContentType.FormData
-            ? { "Content-Type": type }
-            : {}),
+      const response = await this.customFetch(
+        `${baseUrl || this.baseUrl || (typeof window !== "undefined" ? window._BASE_PATH_ : "")}${path}${queryString ? `?${queryString}` : ""}`,
+        {
+          ...requestParams,
+          headers: {
+            ...customHeaders,
+            ...(requestParams.headers || {}),
+            ...(type && type !== ContentType.FormData
+              ? { "Content-Type": type }
+              : {}),
+          },
+          signal:
+            (cancelToken
+              ? this.createAbortSignal(cancelToken)
+              : requestParams.signal) || null,
+          body:
+            typeof body === "undefined" || body === null
+              ? null
+              : payloadFormatter(body),
         },
-        signal:
-          (cancelToken
-            ? this.createAbortSignal(cancelToken)
-            : requestParams.signal) || null,
-        body:
-          typeof body === "undefined" || body === null
-            ? null
-            : payloadFormatter(body),
-      },
-    ).then(async (response) => {
+      );
+
       if (response.status === 401) {
         if (typeof window === "undefined") {
           const pathname = await getServerPathname();
