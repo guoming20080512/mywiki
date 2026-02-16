@@ -2,14 +2,27 @@
 
 # 重启 PandaWiki API 容器脚本
 
+# 进入脚本所在目录
+cd "$(dirname "$0")"
+
 echo "正在重启 PandaWiki API 容器..."
+echo "当前工作目录: $(pwd)"
   
 # 加载环境变量
-if [ -f .env ]; then
-  echo "正在加载环境变量..."
-  export $(cat .env | grep -v '^#' | xargs)
+ENV_FILE=".env"
+if [ -f "$ENV_FILE" ]; then
+  echo "正在加载环境变量文件: $ENV_FILE"
+  # 清理并加载环境变量，排除文件末尾的命令行
+  export $(grep -v '^#' "$ENV_FILE" | grep -v '^docker' | xargs)
+  echo "环境变量加载成功"
+  # 验证关键环境变量
+  echo "关键环境变量验证:"
+  echo "- POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:0:4}..."
+  echo "- NATS_PASSWORD: ${NATS_PASSWORD:0:4}..."
+  echo "- REDIS_PASSWORD: ${REDIS_PASSWORD:0:4}..."
 else
   echo "警告: .env 文件不存在，使用默认环境变量"
+  exit 1
 fi
 
 # 停止并移除 api 容器
