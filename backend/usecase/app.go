@@ -171,8 +171,12 @@ func (u *AppUsecase) UpdateApp(ctx context.Context, id string, appRequest *domai
 	// 清除缓存
 	if appRequest.Settings != nil {
 		// 清除 web app 缓存
-		cacheKey := fmt.Sprintf("panda_wiki:app:web:info:%s", appRequest.KbID)
-		u.cache.Del(ctx, cacheKey)
+		webCacheKey := fmt.Sprintf("panda_wiki:app:web:info:%s", appRequest.KbID)
+		u.cache.Del(ctx, webCacheKey)
+
+		// 清除 widget app 缓存
+		widgetCacheKey := fmt.Sprintf("panda_wiki:app:widget:info:%s", appRequest.KbID)
+		u.cache.Del(ctx, widgetCacheKey)
 
 		app, err := u.repo.GetAppDetail(ctx, id)
 		if err != nil {
@@ -731,6 +735,22 @@ func (u *AppUsecase) ShareGetWebAppInfo(ctx context.Context, kbID string, authId
 }
 
 func (u *AppUsecase) GetWidgetAppInfo(ctx context.Context, kbID string) (*domain.AppInfoResp, error) {
+	// 缓存键设计
+	cacheKey := fmt.Sprintf("panda_wiki:app:widget:info:%s", kbID)
+
+	// 尝试从缓存中获取
+	cachedData, err := u.cache.Get(ctx, cacheKey).Result()
+	if err == nil {
+		// 缓存命中，反序列化数据
+		var appInfo domain.AppInfoResp
+		if err := json.Unmarshal([]byte(cachedData), &appInfo); err == nil {
+			return &appInfo, nil
+		}
+		// 反序列化失败，继续从数据库获取
+		u.logger.Warn("failed to unmarshal cached widget app info", log.Error(err))
+	}
+
+	// 缓存未命中或反序列化失败，从数据库获取
 	webApp, err := u.repo.GetOrCreateAppByKBIDAndType(ctx, kbID, domain.AppTypeWeb)
 	if err != nil {
 		return nil, err
@@ -763,6 +783,11 @@ func (u *AppUsecase) GetWidgetAppInfo(ctx context.Context, kbID string) (*domain
 	if !domain.GetBaseEditionLimitation(ctx).AllowCustomCopyright {
 		appInfo.Settings.WidgetBotSettings.CopyrightHideEnabled = false
 		appInfo.Settings.WidgetBotSettings.CopyrightInfo = domain.SettingCopyrightInfo
+	}
+
+	// 将结果写入缓存，使用 1 个月的过期时间
+	if data, err := json.Marshal(appInfo); err == nil {
+		u.cache.Set(ctx, cacheKey, data, 30*24*time.Hour)
 	}
 
 	return appInfo, nil

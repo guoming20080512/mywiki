@@ -2,9 +2,11 @@ package usecase
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"slices"
+	"time"
 
 	"github.com/gomarkdown/markdown"
 	"github.com/gomarkdown/markdown/html"
@@ -20,6 +22,7 @@ import (
 	"github.com/chaitin/panda-wiki/log"
 	"github.com/chaitin/panda-wiki/repo/mq"
 	"github.com/chaitin/panda-wiki/repo/pg"
+	"github.com/chaitin/panda-wiki/store/cache"
 	"github.com/chaitin/panda-wiki/store/rag"
 	"github.com/chaitin/panda-wiki/store/s3"
 	"github.com/chaitin/panda-wiki/utils"
@@ -38,6 +41,7 @@ type NodeUsecase struct {
 	s3Client     *s3.MinioClient
 	rAGService   rag.RAGService
 	modelUsecase *ModelUsecase
+	cache        *cache.Cache
 }
 
 func NewNodeUsecase(
@@ -53,6 +57,7 @@ func NewNodeUsecase(
 	modelRepo *pg.ModelRepository,
 	authRepo *pg.AuthRepo,
 	modelUsecase *ModelUsecase,
+	cache *cache.Cache,
 ) *NodeUsecase {
 	return &NodeUsecase{
 		nodeRepo:     nodeRepo,
@@ -67,6 +72,7 @@ func NewNodeUsecase(
 		logger:       logger.WithModule("usecase.node"),
 		s3Client:     s3Client,
 		modelUsecase: modelUsecase,
+		cache:        cache,
 	}
 }
 
@@ -358,7 +364,22 @@ func (u *NodeUsecase) convertMDToHTML(mdStr string) string {
 }
 
 func (u *NodeUsecase) GetNodeReleaseListByKBID(ctx context.Context, kbID string, authId uint) ([]*domain.ShareNodeListItemResp, error) {
+	// 缓存键设计
+	cacheKey := fmt.Sprintf("panda_wiki:node:list:%s:%d", kbID, authId)
 
+	// 尝试从缓存中获取
+	cachedData, err := u.cache.Get(ctx, cacheKey).Result()
+	if err == nil {
+		// 缓存命中，反序列化数据
+		var items []*domain.ShareNodeListItemResp
+		if err := json.Unmarshal([]byte(cachedData), &items); err == nil {
+			return items, nil
+		}
+		// 反序列化失败，继续从数据库获取
+		u.logger.Warn("failed to unmarshal cached node list", log.Error(err))
+	}
+
+	// 缓存未命中或反序列化失败，从数据库获取
 	nodes, err := u.nodeRepo.GetNodeReleaseListByKBID(ctx, kbID)
 	if err != nil {
 		return nil, err
@@ -380,6 +401,11 @@ func (u *NodeUsecase) GetNodeReleaseListByKBID(ctx context.Context, kbID string,
 				items = append(items, nodes[i])
 			}
 		}
+	}
+
+	// 将结果写入缓存，使用 1 个月的过期时间
+	if data, err := json.Marshal(items); err == nil {
+		u.cache.Set(ctx, cacheKey, data, 30*24*time.Hour)
 	}
 
 	return items, nil
