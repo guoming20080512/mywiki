@@ -1,6 +1,6 @@
 module github.com/chaitin/panda-wiki
 
-go 1.24.3
+go 1.22.2
 
 require (
 	github.com/JohannesKaufmann/dom v0.2.0
