@@ -51,28 +51,32 @@ mkdir -p ./output
 
 # 编译 panda-wiki-api
 echo "=== 编译 panda-wiki-api ==="
-if GOOS=$TARGETOS GOARCH=$TARGETARCH go build -ldflags "-s -w -extldflags '-static' -X github.com/chaitin/panda-wiki/telemetry.Version=${VERSION}" -o ./output/panda-wiki-api cmd/api/main.go cmd/api/wire_gen.go; then
-    echo "✓ panda-wiki-api 编译成功"
+# 尝试方法1：移除静态编译标志
+if GOOS=$TARGETOS GOARCH=$TARGETARCH go build -ldflags "-s -w -X github.com/chaitin/panda-wiki/telemetry.Version=${VERSION}" -o ./output/panda-wiki-api cmd/api/main.go cmd/api/wire_gen.go; then
+    echo "✓ panda-wiki-api 编译成功（方法1：移除静态编译）"
+elif go build -ldflags "-s -w -X github.com/chaitin/panda-wiki/telemetry.Version=${VERSION}" -o ./output/panda-wiki-api cmd/api/main.go cmd/api/wire_gen.go; then
+    echo "✓ panda-wiki-api 编译成功（方法2：默认平台）"
+elif GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o ./output/panda-wiki-api cmd/api/main.go cmd/api/wire_gen.go; then
+    echo "✓ panda-wiki-api 编译成功（方法3：最小编译标志）"
+elif go build -o ./output/panda-wiki-api cmd/api/main.go cmd/api/wire_gen.go; then
+    echo "✓ panda-wiki-api 编译成功（方法4：默认设置）"
 else
-    echo "✗ panda-wiki-api 编译失败，尝试不指定GOOS/GOARCH"
-    if go build -ldflags "-s -w -extldflags '-static' -X github.com/chaitin/panda-wiki/telemetry.Version=${VERSION}" -o ./output/panda-wiki-api cmd/api/main.go cmd/api/wire_gen.go; then
-        echo "✓ panda-wiki-api 编译成功（使用默认平台）"
-    else
-        echo "✗ panda-wiki-api 编译失败"
-    fi
+    echo "✗ panda-wiki-api 编译失败"
 fi
 
 # 编译 panda-wiki-migrate
 echo "=== 编译 panda-wiki-migrate ==="
-if GOOS=$TARGETOS GOARCH=$TARGETARCH go build -ldflags "-s -w -extldflags '-static' -X github.com/chaitin/panda-wiki/telemetry.Version=${VERSION}" -o ./output/panda-wiki-migrate cmd/migrate/main.go cmd/migrate/wire_gen.go; then
-    echo "✓ panda-wiki-migrate 编译成功"
+# 尝试方法1：移除静态编译标志
+if GOOS=$TARGETOS GOARCH=$TARGETARCH go build -ldflags "-s -w -X github.com/chaitin/panda-wiki/telemetry.Version=${VERSION}" -o ./output/panda-wiki-migrate cmd/migrate/main.go cmd/migrate/wire_gen.go; then
+    echo "✓ panda-wiki-migrate 编译成功（方法1：移除静态编译）"
+elif go build -ldflags "-s -w -X github.com/chaitin/panda-wiki/telemetry.Version=${VERSION}" -o ./output/panda-wiki-migrate cmd/migrate/main.go cmd/migrate/wire_gen.go; then
+    echo "✓ panda-wiki-migrate 编译成功（方法2：默认平台）"
+elif GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o ./output/panda-wiki-migrate cmd/migrate/main.go cmd/migrate/wire_gen.go; then
+    echo "✓ panda-wiki-migrate 编译成功（方法3：最小编译标志）"
+elif go build -o ./output/panda-wiki-migrate cmd/migrate/main.go cmd/migrate/wire_gen.go; then
+    echo "✓ panda-wiki-migrate 编译成功（方法4：默认设置）"
 else
-    echo "✗ panda-wiki-migrate 编译失败，尝试不指定GOOS/GOARCH"
-    if go build -ldflags "-s -w -extldflags '-static' -X github.com/chaitin/panda-wiki/telemetry.Version=${VERSION}" -o ./output/panda-wiki-migrate cmd/migrate/main.go cmd/migrate/wire_gen.go; then
-        echo "✓ panda-wiki-migrate 编译成功（使用默认平台）"
-    else
-        echo "✗ panda-wiki-migrate 编译失败"
-    fi
+    echo "✗ panda-wiki-migrate 编译失败"
 fi
 
 # 检查编译结果
