@@ -6,7 +6,6 @@ import (
 	"github.com/chaitin/panda-wiki/repo/ipdb"
 	mqRepo "github.com/chaitin/panda-wiki/repo/mq"
 	"github.com/chaitin/panda-wiki/repo/pg"
-	"github.com/chaitin/panda-wiki/store/cache"
 	"github.com/chaitin/panda-wiki/store/rag"
 	"github.com/chaitin/panda-wiki/store/s3"
 )
@@ -17,7 +16,6 @@ var ProviderSet = wire.NewSet(
 	ipdb.ProviderSet,
 	rag.ProviderSet,
 	s3.ProviderSet,
-	cache.ProviderSet,
 
 	NewLLMUsecase,
 	NewNodeUsecase,
