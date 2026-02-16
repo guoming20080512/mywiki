@@ -17,6 +17,16 @@ echo "1. 停止并移除现有 api 容器..."
 docker stop wiki-api || true
 docker rm wiki-api || true
 
+# 删除未编译完成的临时文件
+echo "2. 清理临时文件..."
+# 删除 Docker 构建缓存和临时文件
+rm -rf ./backend/output 2>/dev/null || true
+# 删除可能的临时编译文件
+find ./backend -name "*.tmp" -o -name "*.temp" | xargs rm -f 2>/dev/null || true
+# 清理 Go 构建缓存
+go clean -cache -modcache 2>/dev/null || true
+
+echo "3. 开始构建 Docker 镜像..."
 docker build -t  wiki-api -f ./backend/Dockerfile.api ./backend
 
 # 等待构建完成
