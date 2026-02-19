@@ -3,6 +3,7 @@ import { useStore } from '@/provider';
 import { useMemo } from 'react';
 import { getImagePath } from '@/utils/getImagePath';
 import { useBasePath } from '@/hooks';
+import { getBasePath } from '@/utils/getBasePath';
 
 import {
   Footer,
@@ -33,7 +34,7 @@ export const FooterProvider = ({
       catalogWidth={catalogWidth}
       showBrand={showBrand}
       isDocPage={isDocPage}
-      logo='https://release.baizhi.cloud/panda-wiki/icon.png'
+      logo={getBasePath('/images/init/icon.png')}
       docWidth={docWidth}
       footerSetting={
         footerSetting
@@ -71,7 +72,7 @@ export const WelcomeFooter = ({
       catalogWidth={catalogWidth}
       showBrand={showBrand}
       isDocPage={false}
-      logo='https://release.baizhi.cloud/panda-wiki/icon.png'
+      logo={getBasePath('/images/init/icon.png')}
       docWidth='full'
       footerSetting={
         footerSetting
