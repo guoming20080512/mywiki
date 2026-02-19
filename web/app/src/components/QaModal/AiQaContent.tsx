@@ -383,27 +383,11 @@ const AiQaContent: React.FC<{
 
     try {
       for (const image of uploadedImages) {
-        let token = '';
-        try {
-          console.log('开始验证码验证...');
-          const Cap = (await import(`@cap.js/widget`)).default;
-          const cap = new Cap({
-            apiEndpoint: `${basePath}/share/v1/captcha/`,
-          });
-          console.log('验证码服务初始化成功，开始解决验证码...');
-          const solution = await cap.solve();
-          console.log('验证码验证成功，token:', solution.token);
-          token = solution.token;
-        } catch (error: any) {
-          console.error('验证码验证失败:', error.message || error);
-          message.error(`验证失败: ${error.message || '未知错误'}`);
-          return Promise.reject(error);
-        }
-        // 上传新图片
+        // 跳过验证码验证，直接上传图片
         console.log('开始上传图片...');
         const result = await postShareV1CommonFileUpload({
           file: image.file,
-          captcha_token: token,
+          // 不需要 captcha_token
         });
         console.log('图片上传成功，key:', result.key);
         const serverUrl = '/static-file/' + result.key;
@@ -427,33 +411,14 @@ const AiQaContent: React.FC<{
     const imagePaths = await uploadAllImages();
     console.log('图片上传完成，图片路径:', imagePaths);
 
-    let token = '';
-
-    try {
-      console.log('开始AI对话验证码验证...');
-      const Cap = (await import(`@cap.js/widget`)).default;
-      const cap = new Cap({
-        apiEndpoint: `${basePath}/share/v1/captcha/`,
-      });
-      console.log('验证码服务初始化成功，开始解决验证码...');
-      const solution = await cap.solve();
-      console.log('验证码验证成功，token:', solution.token);
-      token = solution.token;
-    } catch (error: any) {
-      console.error('验证码验证失败:', error.message || error);
-      setLoading(false);
-      setThinking(4);
-      message.error(`验证失败: ${error.message || '未知错误'}`);
-      return;
-    }
-
+    // 跳过验证码验证，直接发送请求
     const reqData = {
       message: q,
       image_paths: imagePaths,
       nonce: '',
       conversation_id: '',
       app_type: 1,
-      captcha_token: token,
+      // 不需要 captcha_token
     };
     if (conversationId) reqData.conversation_id = conversationId;
     if (nonce) reqData.nonce = nonce;
