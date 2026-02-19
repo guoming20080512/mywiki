@@ -133,21 +133,8 @@ const SearchDocContent: React.FC<SearchDocContentProps> = ({
     setShowFuzzySuggestions(false);
     setFuzzySuggestions([]);
 
-    let token = '';
-    const Cap = (await import(`@cap.js/widget`)).default;
-    const cap = new Cap({
-      apiEndpoint: `${basePath}/share/v1/captcha/`,
-    });
-    try {
-      const solution = await cap.solve();
-      token = solution.token;
-    } catch (error) {
-      message.error('验证失败');
-      console.log(error, 'error---------');
-      setIsSearching(false);
-      return;
-    }
-    postShareV1ChatSearch({ message: input, captcha_token: token })
+    // 跳过验证码验证，直接调用搜索 API
+    postShareV1ChatSearch({ message: input })
       .then(res => {
         setSearchResults(res.node_result || []);
         setHasSearch(true);
