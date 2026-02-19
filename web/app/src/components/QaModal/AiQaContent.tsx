@@ -387,7 +387,7 @@ const AiQaContent: React.FC<{
         console.log('开始上传图片...');
         const result = await postShareV1CommonFileUpload({
           file: image.file,
-          // 不需要 captcha_token
+          captcha_token: '', // 传递空字符串以满足类型要求
         });
         console.log('图片上传成功，key:', result.key);
         const serverUrl = '/static-file/' + result.key;
