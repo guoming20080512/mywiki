@@ -385,22 +385,27 @@ const AiQaContent: React.FC<{
       for (const image of uploadedImages) {
         let token = '';
         try {
+          console.log('开始验证码验证...');
           const Cap = (await import(`@cap.js/widget`)).default;
           const cap = new Cap({
             apiEndpoint: `${basePath}/share/v1/captcha/`,
           });
+          console.log('验证码服务初始化成功，开始解决验证码...');
           const solution = await cap.solve();
+          console.log('验证码验证成功，token:', solution.token);
           token = solution.token;
-        } catch (error) {
-          message.error('验证失败');
-          console.log(error, 'error---------');
+        } catch (error: any) {
+          console.error('验证码验证失败:', error.message || error);
+          message.error(`验证失败: ${error.message || '未知错误'}`);
           return Promise.reject(error);
         }
         // 上传新图片
+        console.log('开始上传图片...');
         const result = await postShareV1CommonFileUpload({
           file: image.file,
           captcha_token: token,
         });
+        console.log('图片上传成功，key:', result.key);
         const serverUrl = '/static-file/' + result.key;
         uploadedUrls.push(serverUrl);
       }
@@ -408,6 +413,7 @@ const AiQaContent: React.FC<{
       return uploadedUrls;
     } catch (error: any) {
       setLoading(false);
+      console.error('图片上传失败:', error.message || error);
       message.error(error.message || '图片上传失败');
       throw error;
     }
@@ -417,22 +423,27 @@ const AiQaContent: React.FC<{
     setLoading(true);
     setThinking(1);
 
+    console.log('开始AI对话请求处理...');
     const imagePaths = await uploadAllImages();
+    console.log('图片上传完成，图片路径:', imagePaths);
 
     let token = '';
 
-    const Cap = (await import(`@cap.js/widget`)).default;
-    const cap = new Cap({
-      apiEndpoint: `${basePath}/share/v1/captcha/`,
-    });
     try {
+      console.log('开始AI对话验证码验证...');
+      const Cap = (await import(`@cap.js/widget`)).default;
+      const cap = new Cap({
+        apiEndpoint: `${basePath}/share/v1/captcha/`,
+      });
+      console.log('验证码服务初始化成功，开始解决验证码...');
       const solution = await cap.solve();
+      console.log('验证码验证成功，token:', solution.token);
       token = solution.token;
-    } catch (error) {
+    } catch (error: any) {
+      console.error('验证码验证失败:', error.message || error);
       setLoading(false);
       setThinking(4);
-      message.error('验证失败');
-      console.log(error, 'error---------');
+      message.error(`验证失败: ${error.message || '未知错误'}`);
       return;
     }
 
@@ -446,11 +457,14 @@ const AiQaContent: React.FC<{
     };
     if (conversationId) reqData.conversation_id = conversationId;
     if (nonce) reqData.nonce = nonce;
+    
+    console.log('发送AI对话请求:', reqData);
 
     if (sseClientRef.current) {
       sseClientRef.current.subscribe(
         JSON.stringify(reqData),
         ({ type, content, chunk_result }) => {
+          console.log('收到服务器响应:', { type, content: content ? content.substring(0, 100) + '...' : content });
           if (type === 'conversation_id') {
             setConversationId(prev => prev + content);
           } else if (type === 'message_id') {
@@ -458,6 +472,7 @@ const AiQaContent: React.FC<{
           } else if (type === 'nonce') {
             setNonce(prev => prev + content);
           } else if (type === 'error') {
+            console.error('服务器返回错误:', content);
             setLoading(false);
             setThinking(4);
             setConversation(prev => {
@@ -475,6 +490,7 @@ const AiQaContent: React.FC<{
             });
             if (content) message.error(content);
           } else if (type === 'done') {
+            console.log('AI对话完成');
             setConversation(prev => {
               const newConversation = [...prev];
               const lastConversation =
@@ -494,6 +510,7 @@ const AiQaContent: React.FC<{
 
             setThinking(4);
           } else if (type === 'data') {
+            console.log('收到AI回答数据:', content.substring(0, 100) + '...');
             setFullAnswer(prevFullAnswer => {
               const newFullAnswer = prevFullAnswer + content;
 
@@ -527,6 +544,7 @@ const AiQaContent: React.FC<{
               return newFullAnswer;
             });
           } else if (type === 'chunk_result') {
+            console.log('收到搜索结果:', chunk_result);
             setConversation(preConversation => {
               const newConversation = [...preConversation];
               const lastConversation =
