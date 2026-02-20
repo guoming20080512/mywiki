@@ -54,14 +54,18 @@ const MapChart = ({ map, data: chartData, tooltipText }: Props) => {
 
         // 依赖 echarts 全局变量，必须顺序加载
         const chinaCandidates = withBasenameCandidates('/echarts/china.js');
-        const worldCandidates = withBasenameCandidates('/echarts/world.js');
         const geoCandidates = withBasenameCandidates('/geo/geo.js');
-        await loadScriptsInOrder([chinaCandidates[0], worldCandidates[0], geoCandidates[0]]).catch(
+        await loadScriptsInOrder([chinaCandidates[0], geoCandidates[0]]).catch(
           async () => {
             // 如果 basename 版本 404，则回退到根路径版本
-            await loadScriptsInOrder([chinaCandidates[1], worldCandidates[1], geoCandidates[1]]);
+            await loadScriptsInOrder([chinaCandidates[1], geoCandidates[1]]);
           },
         );
+
+        // 注册世界地图
+        if (window.echarts && window.$GeoJSON) {
+          window.echarts.registerMap('world', window.$GeoJSON);
+        }
 
         if (!isUnmounted) setResourceLoaded(true);
       } catch (e) {
