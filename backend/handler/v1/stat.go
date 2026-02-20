@@ -27,7 +27,7 @@ func NewStatHandler(baseHandler *handler.BaseHandler, echo *echo.Echo, usecase *
 		logger:      logger.WithModule("handler.v1.stat"),
 	}
 
-	group := echo.Group("/api/v1/stat", h.auth.Authorize, auth.ValidateKBUserPerm(consts.UserKBPermissionDataOperate))
+	group := echo.Group("/api/v1/stat", h.auth.Authorize, auth.ValidateKBUserPerm(consts.UserKBPermissionNotNull))
 
 	// 实时
 	group.GET("/instant_count", h.GetInstantCount) // instant count (30min, every 1min)
