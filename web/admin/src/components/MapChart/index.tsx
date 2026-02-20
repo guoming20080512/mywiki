@@ -4,6 +4,14 @@ import type { ECharts } from 'echarts';
 import { useEffect, useRef, useState } from 'react';
 import { loadScript, loadScriptsInOrder } from '@/utils/loadScript';
 
+// Extend Window interface to include $GeoJSON
+interface WindowWithGeoJSON extends Window {
+  $GeoJSON: any;
+  echarts: any;
+}
+
+declare const window: WindowWithGeoJSON;
+
 interface Props {
   map: 'china' | 'world' | string;
   data: TrendData[];
