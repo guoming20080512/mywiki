@@ -11,6 +11,7 @@ import (
 	"github.com/chaitin/panda-wiki/handler"
 	"github.com/chaitin/panda-wiki/log"
 	"github.com/chaitin/panda-wiki/usecase"
+	"github.com/chaitin/panda-wiki/utils"
 )
 
 type ShareStatHandler struct {
@@ -80,7 +81,17 @@ func (h *ShareStatHandler) RecordPage(c echo.Context) error {
 	if sessionID == "" {
 		return h.NewResponseWithError(c, "session id not found", err)
 	}
-	ip := c.RealIP()
+
+	// Trusted proxies as provided by user
+	trustedProxies := []string{
+		"64.176.82.251/32",
+		"127.0.0.1/32",
+		"172.17.0.1/32",
+		"169.254.15.1/32",
+	}
+
+	// Get client IP using trusted proxies
+	ip := utils.GetClientIPWithEcho(c, trustedProxies)
 	stat := &domain.StatPage{
 		KBID:        kbID,
 		UserID:      userIDValue,

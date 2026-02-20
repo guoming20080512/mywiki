@@ -24,6 +24,80 @@ func ExtractHostFromRemoteAddr(r *http.Request) string {
 	return host
 }
 
+func IsIPInCIDR(ipStr string, cidrStr string) bool {
+	ip := net.ParseIP(ipStr)
+	if ip == nil {
+		return false
+	}
+
+	_, cidr, err := net.ParseCIDR(cidrStr)
+	if err != nil {
+		return false
+	}
+
+	return cidr.Contains(ip)
+}
+
+func IsIPInList(ipStr string, ipList []string) bool {
+	for _, item := range ipList {
+		item = strings.TrimSpace(item)
+		if item == "" {
+			continue
+		}
+
+		if strings.Contains(item, "/") {
+			if IsIPInCIDR(ipStr, item) {
+				return true
+			}
+		} else {
+			if ipStr == item {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func GetClientIP(r *http.Request, trustedProxies []string) string {
+	remoteIP := ExtractHostFromRemoteAddr(r)
+
+	if remoteIP == "" {
+		return ""
+	}
+
+	if !IsIPInList(remoteIP, trustedProxies) {
+		return remoteIP
+	}
+
+	xForwardedFor := r.Header.Get("X-Forwarded-For")
+	if xForwardedFor != "" {
+		ips := strings.Split(xForwardedFor, ",")
+		for i := len(ips) - 1; i >= 0; i-- {
+			ip := strings.TrimSpace(ips[i])
+			if ip == "" {
+				continue
+			}
+			if !IsIPInList(ip, trustedProxies) {
+				return ip
+			}
+		}
+	}
+
+	xRealIP := r.Header.Get("X-Real-IP")
+	if xRealIP != "" {
+		ip := strings.TrimSpace(xRealIP)
+		if ip != "" && !IsIPInList(ip, trustedProxies) {
+			return ip
+		}
+	}
+
+	return remoteIP
+}
+
+func GetClientIPWithEcho(c echo.Context, trustedProxies []string) string {
+	return GetClientIP(c.Request(), trustedProxies)
+}
+
 // IsPrivateOrReservedIP checks if the given IP address is private or reserved
 func IsPrivateOrReservedIP(ipStr string) bool {
 	ip := net.ParseIP(ipStr)
