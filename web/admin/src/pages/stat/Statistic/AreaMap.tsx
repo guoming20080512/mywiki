@@ -3,7 +3,6 @@ import { getApiV1StatGeoCount } from '@/request/Stat';
 import Nodata from '@/assets/images/nodata.png';
 import Card from '@/components/Card';
 import MapChart from '@/components/MapChart';
-import { ChinaProvinceSortName } from '@/constant/area';
 import { useAppSelector } from '@/store';
 import { Box, Stack } from '@mui/material';
 import { useEffect, useState } from 'react';
@@ -20,25 +19,25 @@ const AreaMap = ({ tab }: { tab: ActiveTab }) => {
         .map(([key, value]) => {
           const [country, province, city] = key.split('|');
           return {
-            name: ChinaProvinceSortName[province] || province,
+            name: country || '未知',
             count: value,
           };
         })
         .filter(item => !!item.name);
 
-      const provinceMap = new Map();
+      const countryMap = new Map();
       for (let i = 0; i < list.length; i++) {
-        if (!provinceMap.has(list[i].name)) {
-          provinceMap.set(list[i].name, list[i].count);
+        if (!countryMap.has(list[i].name)) {
+          countryMap.set(list[i].name, list[i].count);
         } else {
-          provinceMap.set(
+          countryMap.set(
             list[i].name,
-            provinceMap.get(list[i].name)! + list[i].count,
+            countryMap.get(list[i].name)! + list[i].count,
           );
         }
       }
       setList(
-        Array.from(provinceMap, ([name, count]) => ({ name, count })).sort(
+        Array.from(countryMap, ([name, count]) => ({ name, count })).sort(
           (a, b) => b.count - a.count,
         ),
       );
@@ -53,7 +52,7 @@ const AreaMap = ({ tab }: { tab: ActiveTab }) => {
         position: 'relative',
       }}
     >
-      <MapChart map='china' data={list} tooltipText={'用户数量'} />
+      <MapChart map='world' data={list} tooltipText={'用户数量'} />
       <Box
         sx={{
           position: 'absolute',
@@ -63,7 +62,7 @@ const AreaMap = ({ tab }: { tab: ActiveTab }) => {
           fontWeight: 'bold',
         }}
       >
-        用户分布
+        访问来源分布
       </Box>
       <Box
         sx={{
