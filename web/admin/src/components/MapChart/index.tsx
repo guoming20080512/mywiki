@@ -88,15 +88,72 @@ const MapChart = ({ map, data: chartData, tooltipText }: Props) => {
 
   useEffect(() => {
     if (!resourceLoaded) return;
-    setMax(Math.max(1, ...chartData.map(i => i.count)));
-    setData(chartData.map(it => ({ name: it.name, value: it.count })));
+    // 计算最大值和转换数据格式
+    const newMax = Math.max(1, ...chartData.map(i => i.count));
+    const newData = chartData.map(it => ({ name: it.name, value: it.count }));
+    setMax(newMax);
+    setData(newData);
+    // 初始化图表实例
     if (domWrapRef.current && !echartRef.current) {
       type EchartsGlobal = { init: (el: HTMLDivElement) => ECharts };
       const echartsGlobal = (window as unknown as { echarts: EchartsGlobal })
         .echarts;
       echartRef.current = echartsGlobal.init(domWrapRef.current);
+      // 立即设置选项，确保图表初始化时就有数据
+      if (echartRef.current) {
+        const option = {
+          grid: {
+            top: 0,
+            bottom: 0,
+            right: 0,
+            left: 0,
+          },
+          tooltip: {
+            formatter: (params: { name: string; value: number | string }) => {
+              return `${params.name}<br />${tooltipText}: <span style='font-weight: 700'>${params.value || 0}</span>`;
+            },
+          },
+          visualMap: [
+            {
+              show: true,
+              orient: 'horizontal',
+              left: 8,
+              bottom: 8,
+              itemWidth: 10,
+              color: ['#3082FF', '#EBF3FF'],
+              max: newMax,
+              textStyle: {
+                color: theme.palette.primary.main,
+              },
+            },
+          ],
+          series: [
+            {
+              type: 'map',
+              map,
+              data: newData,
+              itemStyle: {
+                borderColor: theme.palette.divider,
+                areaColor: '#DDE4F0',
+                emphasis: {
+                  show: true,
+                  areaColor: '#A9C0E3',
+                },
+              },
+            },
+          ],
+        };
+        echartRef.current.setOption(option, true);
+      }
     }
-  }, [chartData, resourceLoaded]);
+  }, [
+    chartData,
+    resourceLoaded,
+    map,
+    theme.palette.divider,
+    theme.palette.primary.main,
+    tooltipText,
+  ]);
 
   useEffect(() => {
     if (!echartRef.current) return;

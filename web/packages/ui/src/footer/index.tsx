@@ -2,7 +2,11 @@
 import React from 'react';
 import { Box, Divider, Stack, Link, alpha } from '@mui/material';
 import { useState } from 'react';
-import { IconDianhua, IconWeixingongzhonghao } from '@panda-wiki/icons';
+import {
+  IconDianhua,
+  IconWeixingongzhonghao,
+  IconALianjie5,
+} from '@panda-wiki/icons';
 import Overlay from './Overlay';
 import { DocWidth } from '../constants';
 import { PROJECT_NAME } from '../constants';
@@ -167,6 +171,12 @@ const Footer = React.memo(
                                 });
                                 setOpen(true);
                               }
+                              if (
+                                account.channel === 'twitter' &&
+                                account.link
+                              ) {
+                                window.open(account.link, '_blank');
+                              }
                             }}
                           >
                             {account.channel === 'wechat_oa' && (
@@ -178,6 +188,11 @@ const Footer = React.memo(
                               <IconDianhua
                                 sx={{ fontSize: '20px', color: 'inherit' }}
                               ></IconDianhua>
+                            )}
+                            {account.channel === 'twitter' && (
+                              <IconALianjie5
+                                sx={{ fontSize: '20px', color: 'inherit' }}
+                              ></IconALianjie5>
                             )}
                             <Box
                               sx={{
@@ -236,6 +251,31 @@ const Footer = React.memo(
                         );
                       },
                     )}
+                    {/* 官方推特链接 */}
+                    <Stack
+                      direction={'row'}
+                      sx={theme => ({
+                        position: 'relative',
+                        color: alpha(theme.palette.text.primary, 0.7),
+                      })}
+                      gap={1}
+                      onClick={() => {
+                        window.open('https://x.com/cryptobtcaiwiki', '_blank');
+                      }}
+                    >
+                      <IconALianjie5
+                        sx={{ fontSize: '20px', color: 'inherit' }}
+                      ></IconALianjie5>
+                      <Box
+                        sx={{
+                          lineHeight: '24px',
+                          fontSize: '14px',
+                          color: 'inherit',
+                        }}
+                      >
+                        官方推特
+                      </Box>
+                    </Stack>
                   </Stack>
                 </Box>
               )}
@@ -327,7 +367,6 @@ const Footer = React.memo(
                 {footerSetting?.icp}
               </Stack>
             )}
-
           </Box>
           <Overlay open={open} onClose={setOpen}>
             <Stack
@@ -534,6 +573,11 @@ const Footer = React.memo(
                                 sx={{ fontSize: '20px', color: 'inherit' }}
                               ></IconDianhua>
                             )}
+                            {account.channel === 'twitter' && (
+                              <IconALianjie5
+                                sx={{ fontSize: '20px', color: 'inherit' }}
+                              ></IconALianjie5>
+                            )}
 
                             <Box
                               sx={{
@@ -624,6 +668,35 @@ const Footer = React.memo(
                         );
                       },
                     )}
+                    {/* 官方推特链接 */}
+                    <Stack
+                      direction={'row'}
+                      sx={theme => ({
+                        position: 'relative',
+                        '&:hover': {
+                          color: theme.palette.primary.main,
+                        },
+                        color: alpha(theme.palette.text.primary, 0.7),
+                        cursor: 'pointer',
+                      })}
+                      gap={1}
+                      onClick={() => {
+                        window.open('https://x.com/cryptobtcaiwiki', '_blank');
+                      }}
+                    >
+                      <IconALianjie5
+                        sx={{ fontSize: '20px', color: 'inherit' }}
+                      ></IconALianjie5>
+                      <Box
+                        sx={{
+                          lineHeight: '24px',
+                          fontSize: '14px',
+                          color: 'inherit',
+                        }}
+                      >
+                        官方推特
+                      </Box>
+                    </Stack>
                   </Stack>
                 </Stack>
               )}
@@ -730,7 +803,6 @@ const Footer = React.memo(
                     </Link>
                   </>
                 )}
-
               </Stack>
             </Stack>
           </Box>

@@ -44,25 +44,28 @@ export async function generateMetadata(): Promise<Metadata> {
   const serverHeaders = await getServerHeader();
   const kbDetail: any = await requestTimer(
     'getShareV1AppWebInfo (metadata)',
-    () => getShareV1AppWebInfo({ headers: serverHeaders })
+    () => getShareV1AppWebInfo({ headers: serverHeaders }),
   );
   const basePath = getBasePath(kbDetail?.base_url || '');
   const icon = getImagePath(kbDetail?.settings?.icon || '', basePath);
-  
+
   // 使用cryptobtc作为网站名称，添加描述性内容和服务地区信息
   const title = 'cryptobtc - 加密资产百科全书 | 仅服务中国香港和中国澳门用户';
-  
+
   return {
     metadataBase: new URL(process.env.TARGET || ''),
     title,
-    description: 'cryptobtc是专注于加密资产的百科全书，提供全面的区块链和数字货币知识，包括比特币、以太坊等加密货币的详细介绍和技术解析。仅服务中国香港和中国澳门用户。',
-    keywords: 'cryptobtc,加密资产,区块链,数字货币,百科全书,wiki,crypto,bitcoin,香港,澳门',
+    description:
+      'cryptobtc是专注于加密资产的百科全书，提供全面、专业的区块链和数字货币知识，包括比特币、以太坊等主流加密货币的介绍、解析、投资指南和市场分析。提供专业的AI智能答疑功能，实时解答用户的加密资产相关问题。提供专业、准确、及时、全面的加密资产信息，帮助用户了解区块链核心和应用，为用户的加密资产相关决策提供科学、客观的参考依据。',
+    keywords:
+      'cryptobtc,加密资产,区块链,数字货币,百科全书,wiki,crypto,bitcoin,香港,澳门',
     icons: {
       icon: icon || `${basePath}/favicon.png`,
     },
     openGraph: {
       title,
-      description: 'cryptobtc是专注于加密资产的百科全书，提供全面的区块链和数字货币知识，包括比特币、以太坊等加密货币的详细介绍和技术解析。仅服务中国香港和中国澳门用户。',
+      description:
+        'cryptobtc是专注于加密资产的百科全书，提供全面、专业的区块链和数字货币知识，包括比特币、以太坊等主流加密货币的介绍、解析、投资指南和市场分析。提供专业的AI智能答疑功能，实时解答用户的加密资产相关问题。提供专业、准确、及时、全面的加密资产信息，帮助用户了解区块链核心和应用，为用户的加密资产相关决策提供科学、客观的参考依据。',
       images: icon ? [icon] : [],
     },
   };
@@ -83,11 +86,10 @@ const Layout = async ({
   let error: any = null;
 
   const serverHeaders = await getServerHeader();
-  
+
   const [kbDetailResolve] = await Promise.allSettled([
-    requestTimer(
-      'getShareV1AppWebInfo (layout)',
-      () => getShareV1AppWebInfo({ headers: serverHeaders })
+    requestTimer('getShareV1AppWebInfo (layout)', () =>
+      getShareV1AppWebInfo({ headers: serverHeaders }),
     ),
   ]);
 
@@ -125,12 +127,34 @@ const Layout = async ({
                 }}
                 id='app-theme-root'
               >
-                <Box sx={{ bgcolor: '#FFF3CD', color: '#856404', py: 1, px: 3, textAlign: 'center', borderBottom: '1px solid #FFEAA7', fontSize: 14 }}>
-                  本网站 仅限中国香港、中国澳门地区用户 使用，仅提供区块链及加密资产相关技术科普内容，不面向其他地区提供服务。
+                <Box
+                  sx={{
+                    bgcolor: '#FFF3CD',
+                    color: '#856404',
+                    py: 1,
+                    px: 3,
+                    textAlign: 'center',
+                    borderBottom: '1px solid #FFEAA7',
+                    fontSize: 14,
+                  }}
+                >
+                  本网站 仅限中国香港、中国澳门地区用户
+                  使用，仅提供区块链及加密资产相关技术科普内容，不面向其他地区提供服务。
                 </Box>
                 {error ? <ErrorComponent error={error} /> : children}
-                <Box sx={{ bgcolor: '#FFF3CD', color: '#856404', py: 1, px: 3, textAlign: 'center', borderTop: '1px solid #FFEAA7', fontSize: 14 }}>
-                  本网站 仅限中国香港、中国澳门地区用户 使用，仅提供区块链及加密资产相关技术科普内容，不面向其他地区提供服务。
+                <Box
+                  sx={{
+                    bgcolor: '#FFF3CD',
+                    color: '#856404',
+                    py: 1,
+                    px: 3,
+                    textAlign: 'center',
+                    borderTop: '1px solid #FFEAA7',
+                    fontSize: 14,
+                  }}
+                >
+                  本网站 仅限中国香港、中国澳门地区用户
+                  使用，仅提供区块链及加密资产相关技术科普内容，不面向其他地区提供服务。
                 </Box>
               </Box>
             </StoreProvider>
