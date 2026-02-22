@@ -103,7 +103,7 @@ const Layout = async ({
   const basePath = getBasePath(kbDetail?.base_url || '');
 
   return (
-    <html lang='en'>
+    <html lang='zh-CN'>
       <Script
         id='base-path'
         dangerouslySetInnerHTML={{
