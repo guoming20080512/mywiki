@@ -149,41 +149,9 @@ docker run -d \
   -e SUBNET_PREFIX=${SUBNET_PREFIX:-169.254.15} \
   chaitin-registry.cn-hangzhou.cr.aliyuncs.com/chaitin/panda-wiki-consumer:v3.70.0
 
-# 3.4 启动 Caddy
-docker run -d \
-  --name panda-wiki-caddy \
-  --restart always \
-  --cap-add NET_ADMIN \
-  -p 80:80 \
-  -p 443:443 \
-  -p 2019:2019 \
-  -v ./data/caddy/caddy_config:/config \
-  -v ./data/caddy/caddy_data:/data \
-  -v ./data/caddy/run:/var/run/caddy \
-  -e CADDY_ADMIN=unix//var/run/caddy/caddy-admin.sock \
-  --network host \
-  chaitin-registry.cn-hangzhou.cr.aliyuncs.com/chaitin/panda-wiki-caddy:2.10-alpine
 
 # 等待 Caddy 启动
 sleep 3
-
-# 3.5 启动 API
-docker run -d \
-  --name panda-wiki-api \
-  --network panda-wiki \
-  --ip ${SUBNET_PREFIX:-169.254.15}.2 \
-  -p 8000:8000 \
-  -v ./data/caddy/run:/app/run \
-  -v ./data/nginx/ssl:/app/etc/nginx/ssl \
-  -v ./data/conf/api:/data \
-  -e NATS_PASSWORD=$NATS_PASSWORD \
-  -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
-  -e REDIS_PASSWORD=$REDIS_PASSWORD \
-  -e S3_SECRET_KEY=$S3_SECRET_KEY \
-  -e JWT_SECRET=$JWT_SECRET \
-  -e ADMIN_PASSWORD=$ADMIN_PASSWORD \
-  -e SUBNET_PREFIX=${SUBNET_PREFIX:-169.254.15} \
-  chaitin-registry.cn-hangzhou.cr.aliyuncs.com/chaitin/panda-wiki-api:v3.70.0
 
 # 4. 验证服务状态
 echo "=== 服务启动完成，验证状态 ==="
