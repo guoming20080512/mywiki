@@ -7,6 +7,9 @@
 # 4. NATS (panda-wiki-nats)：轻量级消息队列系统，实现组件间异步通信
 # 5. Qdrant (panda-wiki-qdrant)：向量数据库，存储文档向量嵌入，支持语义搜索
 # 6. Raglite (panda-wiki-raglite)：检索增强生成服务，处理文档向量和检索
+# 7. Crawler (panda-wiki-crawler)：文档爬取服务，处理文档内容的抓取和解析
+# 8. API (panda-wiki-api)：后端API服务，处理业务逻辑
+# 9. Consumer (panda-wiki-consumer)：消息消费者服务，处理异步任务
 
 # 进入项目根目录
 cd "$(dirname "$0")"
@@ -94,7 +97,22 @@ docker run -d \
 # 3. 启动依赖服务
 echo "=== 启动依赖服务 ==="
 
-# 3.1 启动 Raglite
+# 3.1 启动 Crawler (panda-wiki-crawler)
+docker run -d \
+  --name panda-wiki-crawler \
+  --network panda-wiki \
+  --ip ${SUBNET_PREFIX:-169.254.15}.17 \
+  -e GLOG_GLOBAL_LEVEL=info \
+  -e NAMESPACE=anydoc \
+  -e MQ_NATS_URL=nats://panda-wiki-nats:4222 \
+  -e MQ_NATS_USER=panda-wiki \
+  -e MQ_NATS_PASSWORD=$NATS_PASSWORD \
+  -e OSS_MINIO_ACCESS_KEY=s3panda-wiki \
+  -e OSS_MINIO_SECRET_KEY=$S3_SECRET_KEY \
+  -e OSS_MINIO_ENDPOINT=panda-wiki-minio:9000 \
+  chaitin-registry.cn-hangzhou.cr.aliyuncs.com/chaitin/anydoc:v0.9.6
+
+# 3.2 启动 Raglite
 docker run -d \
   --name panda-wiki-raglite \
   --network panda-wiki \
@@ -118,7 +136,56 @@ docker run -d \
 # 等待 Raglite 启动
 sleep 3
 
-# 6. 验证服务状态
+# 3.3 启动 Consumer
+docker run -d \
+  --name panda-wiki-consumer \
+  --network panda-wiki \
+  --ip ${SUBNET_PREFIX:-169.254.15}.3 \
+  -e NATS_PASSWORD=$NATS_PASSWORD \
+  -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
+  -e REDIS_PASSWORD=$REDIS_PASSWORD \
+  -e S3_SECRET_KEY=$S3_SECRET_KEY \
+  -e JWT_SECRET=$JWT_SECRET \
+  -e SUBNET_PREFIX=${SUBNET_PREFIX:-169.254.15} \
+  chaitin-registry.cn-hangzhou.cr.aliyuncs.com/chaitin/panda-wiki-consumer:v3.70.0
+
+# 3.4 启动 Caddy
+docker run -d \
+  --name panda-wiki-caddy \
+  --restart always \
+  --cap-add NET_ADMIN \
+  -p 80:80 \
+  -p 443:443 \
+  -p 2019:2019 \
+  -v ./data/caddy/caddy_config:/config \
+  -v ./data/caddy/caddy_data:/data \
+  -v ./data/caddy/run:/var/run/caddy \
+  -e CADDY_ADMIN=unix//var/run/caddy/caddy-admin.sock \
+  --network host \
+  chaitin-registry.cn-hangzhou.cr.aliyuncs.com/chaitin/panda-wiki-caddy:2.10-alpine
+
+# 等待 Caddy 启动
+sleep 3
+
+# 3.5 启动 API
+docker run -d \
+  --name panda-wiki-api \
+  --network panda-wiki \
+  --ip ${SUBNET_PREFIX:-169.254.15}.2 \
+  -p 8000:8000 \
+  -v ./data/caddy/run:/app/run \
+  -v ./data/nginx/ssl:/app/etc/nginx/ssl \
+  -v ./data/conf/api:/data \
+  -e NATS_PASSWORD=$NATS_PASSWORD \
+  -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
+  -e REDIS_PASSWORD=$REDIS_PASSWORD \
+  -e S3_SECRET_KEY=$S3_SECRET_KEY \
+  -e JWT_SECRET=$JWT_SECRET \
+  -e ADMIN_PASSWORD=$ADMIN_PASSWORD \
+  -e SUBNET_PREFIX=${SUBNET_PREFIX:-169.254.15} \
+  chaitin-registry.cn-hangzhou.cr.aliyuncs.com/chaitin/panda-wiki-api:v3.70.0
+
+# 4. 验证服务状态
 echo "=== 服务启动完成，验证状态 ==="
 sleep 5
 docker ps

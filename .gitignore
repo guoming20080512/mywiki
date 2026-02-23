@@ -33,3 +33,14 @@ local
 
 .idea
 __debug*
+
+# Binance Academy files
+binance_academy_markdown/
+binance_academy_all_pages copy.json
+binance_academy_all_pages.json
+binance_academy_cleaned.json
+loadba.py
+modify_markdown_files.py
+format_binance_academy.py
+fix_file_extensions.py
+fix_file_extensions_properly.py
