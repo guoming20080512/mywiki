@@ -10,7 +10,7 @@ import (
 	"github.com/chaitin/panda-wiki/config"
 	"github.com/chaitin/panda-wiki/handler"
 	"github.com/chaitin/panda-wiki/handler/share"
-	"github.com/chaitin/panda-wiki/handler/v1"
+	v1 "github.com/chaitin/panda-wiki/handler/v1"
 	"github.com/chaitin/panda-wiki/log"
 	"github.com/chaitin/panda-wiki/middleware"
 	"github.com/chaitin/panda-wiki/mq"
@@ -140,6 +140,9 @@ func createApp() (*App, error) {
 		return nil, err
 	}
 	authV1Handler := v1.NewAuthV1Handler(echo, baseHandler, logger, authUsecase)
+	licenseRepository := pg2.NewLicenseRepository(db, logger)
+	licenseUsecase := usecase.NewLicenseUsecase(licenseRepository, logger)
+	licenseHandler := v1.NewLicenseHandler(echo, baseHandler, logger, licenseUsecase, authMiddleware)
 	apiHandlers := &v1.APIHandlers{
 		UserHandler:          userHandler,
 		KnowledgeBaseHandler: knowledgeBaseHandler,
@@ -153,6 +156,7 @@ func createApp() (*App, error) {
 		StatHandler:          statHandler,
 		CommentHandler:       commentHandler,
 		AuthV1Handler:        authV1Handler,
+		LicenseHandler:       licenseHandler,
 	}
 	shareNodeHandler := share.NewShareNodeHandler(baseHandler, echo, nodeUsecase, logger)
 	shareAppHandler := share.NewShareAppHandler(echo, baseHandler, logger, appUsecase)

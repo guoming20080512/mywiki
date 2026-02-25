@@ -3,9 +3,25 @@ package domain
 import (
 	"context"
 	"encoding/json"
+	"time"
 )
 
 const ContextKeyEditionLimitation contextKey = "edition_limitation"
+
+type License struct {
+	ID        int       `json:"id"`
+	Type      string    `json:"type"`
+	Code      string    `json:"code"`
+	Data      []byte    `json:"data"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
+type LicenseResp struct {
+	Edition int32  `json:"edition"`
+	State   int    `json:"state"`
+	Type    string `json:"type"`
+	Code    string `json:"code"`
+}
 
 type BaseEditionLimitation struct {
 	MaxKb                  int   `json:"max_kb"`                     // 知识库站点数量
