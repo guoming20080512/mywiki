@@ -44,3 +44,10 @@ modify_markdown_files.py
 format_binance_academy.py
 fix_file_extensions.py
 fix_file_extensions_properly.py
+
+# Markdown files directories
+md/
+optimized_files/
+
+# .github/baa directory
+.github/baa/
