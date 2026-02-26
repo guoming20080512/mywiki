@@ -45,9 +45,19 @@ format_binance_academy.py
 fix_file_extensions.py
 fix_file_extensions_properly.py
 
+# OKX Academy files
+okx_academy_markdown/
+
 # Markdown files directories
 md/
 optimized_files/
 
 # .github/baa directory
 .github/baa/
+web/app/src/app/layout.tsx
+loadok.py
+.gitignore
+t.txt
+crawl_okx_academy.py
+t_formatted.txt
+t.txt

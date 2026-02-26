@@ -50,7 +50,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const icon = getImagePath(kbDetail?.settings?.icon || '', basePath);
 
   // 使用cryptobtc作为网站名称，添加描述性内容和服务地区信息
-  const title = 'cryptobtc - 加密资产百科全书 | 仅服务中国香港和中国澳门用户';
+  const title = 'cryptobtc - 加密资产百科全书 ';
 
   return {
     metadataBase: new URL(process.env.TARGET || ''),

@@ -85,7 +85,13 @@ export const formatMeta = async (
     title,
     description,
     keywords,
-  }: { title?: string; description?: string; keywords?: string | string[] },
+    image,
+  }: {
+    title?: string;
+    description?: string;
+    keywords?: string | string[];
+    image?: string;
+  },
   parent: ResolvingMetadata,
 ) => {
   const keywordsIsEmpty =
@@ -94,12 +100,37 @@ export const formatMeta = async (
     title: parentTitle,
     description: parentDescription,
     keywords: parentKeywords,
+    openGraph: parentOpenGraph,
   } = await parent;
 
+  // 提取父标题的核心部分（去掉描述性内容）
+  const parentTitleBase = parentTitle?.absolute?.split(' - ')[0] || 'cryptobtc';
+  const fullTitle = title
+    ? `${title} | ${parentTitleBase}`
+    : parentTitle?.absolute || parentTitleBase;
+
+  // 截断描述，避免过长
+  const truncatedDescription = description
+    ? description.length > 200
+      ? description.slice(0, 197) + '...'
+      : description
+    : parentDescription;
+
   return {
-    title: title ? `${parentTitle?.absolute} - ${title}` : parentTitle,
-    description: description || parentDescription,
+    title: fullTitle,
+    description: truncatedDescription,
     keywords: keywordsIsEmpty ? parentKeywords : keywords,
+    openGraph: {
+      title: fullTitle,
+      description: truncatedDescription,
+      images: image ? [image] : parentOpenGraph?.images,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: fullTitle,
+      description: truncatedDescription,
+      images: image ? [image] : undefined,
+    },
   };
 };
 

@@ -25,8 +25,28 @@ export async function generateMetadata(
     console.log(error);
   }
 
+  // 使用节点名称作为关键词基础
+  const keywords = [
+    'cryptobtc',
+    '加密资产',
+    '区块链',
+    '数字货币',
+    '币安',
+    '欧易',
+    node?.name,
+  ].filter(Boolean);
+
+  // 优先使用节点摘要
+  const description = node?.meta?.summary;
+  console.log('Node meta:', node?.meta);
+  console.log('Using description:', description);
+
   return await formatMeta(
-    { title: node?.name, description: node?.meta?.summary },
+    {
+      title: node?.name,
+      description: description,
+      keywords,
+    },
     parent,
   );
 }
