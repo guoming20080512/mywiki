@@ -198,6 +198,7 @@ export { default as IconTokenguanli } from './IconTokenguanli';
 export { default as IconTongjifenxi1 } from './IconTongjifenxi1';
 export { default as IconTuozhuai } from './IconTuozhuai';
 export { default as IconTupian } from './IconTupian';
+export { default as IconTwitter } from './IconTwitter';
 export { default as IconTushu } from './IconTushu';
 export { default as IconUI_icon_wangfanjiantou } from './IconUI_icon_wangfanjiantou';
 export { default as IconUnknow1 } from './IconUnknow1';

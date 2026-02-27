@@ -2,7 +2,11 @@
 import React from 'react';
 import { Box, Divider, Stack, Link, alpha } from '@mui/material';
 import { useState } from 'react';
-import { IconDianhua, IconWeixingongzhonghao } from '@panda-wiki/icons';
+import {
+  IconDianhua,
+  IconWeixingongzhonghao,
+  IconTwitter,
+} from '@panda-wiki/icons';
 import Overlay from './Overlay';
 import { decodeBase64 } from '../utils';
 import { PROJECT_NAME } from '../constants';
@@ -137,101 +141,31 @@ const Footer = React.memo(
                     </Box>
                   )}
                   <Stack direction={'column'} gap={2.5} mt={2}>
-                    {customStyle?.social_media_accounts?.map(
-                      (account, index) => {
-                        return (
-                          <Stack
-                            direction={'row'}
-                            key={index}
-                            sx={theme => ({
-                              position: 'relative',
-                              color: alpha(theme.palette.text.primary, 0.7),
-                            })}
-                            gap={1}
-                            onClick={() => {
-                              setCurOverlayType(account.channel || '');
-                              if (account.channel === 'phone') {
-                                setPhoneData({
-                                  phone: account.phone || '',
-                                  text: account.text || '',
-                                });
-                                setOpen(true);
-                              }
-                              if (account.channel === 'wechat_oa') {
-                                setWechatData({
-                                  src: account.icon || '',
-                                  text: account.text || '',
-                                });
-                                setOpen(true);
-                              }
-                            }}
-                          >
-                            {account.channel === 'wechat_oa' && (
-                              <IconWeixingongzhonghao
-                                sx={{ fontSize: '20px', color: 'inherit' }}
-                              />
-                            )}
-                            {account.channel === 'phone' && (
-                              <IconDianhua
-                                sx={{ fontSize: '20px', color: 'inherit' }}
-                              ></IconDianhua>
-                            )}
-                            <Box
-                              sx={{
-                                lineHeight: '24px',
-                                fontSize: '12px',
-                                color: 'inherit',
-                              }}
-                            >
-                              {account.text}
-                            </Box>
-                            {account.channel === 'wechat_oa' &&
-                              (account?.text || account?.icon) && (
-                                <Stack
-                                  direction={'column'}
-                                  alignItems={'center'}
-                                  p={1.5}
-                                  sx={theme => ({
-                                    position: 'absolute',
-                                    top: '40px',
-                                    left: 0,
-                                    boxShadow:
-                                      ' 0px 4px 8px 0px ' +
-                                      alpha(theme.palette.text.primary, 0.25),
-                                    borderRadius: '4px',
-                                    bgcolor: theme.palette.background.default,
-                                  })}
-                                  gap={1}
-                                  display={'none'}
-                                  zIndex={999}
-                                >
-                                  {account.icon && (
-                                    <img
-                                      src={account.icon}
-                                      width={83}
-                                      height={83}
-                                    ></img>
-                                  )}
-                                  {account.text && (
-                                    <Box
-                                      sx={{
-                                        fontSize: '12px',
-                                        lineHeight: '16px',
-                                        color: 'text.primary',
-                                        maxWidth: '83px',
-
-                                        textAlign: 'center',
-                                      }}
-                                    >
-                                      {account.text}
-                                    </Box>
-                                  )}
-                                </Stack>
-                              )}
-                          </Stack>
-                        );
-                      },
-                    )}
+                    {/* 官方推特链接 */}
+                    <Stack
+                      direction={'row'}
+                      sx={theme => ({
+                        position: 'relative',
+                        color: alpha(theme.palette.text.primary, 0.7),
+                      })}
+                      gap={1}
+                      onClick={() => {
+                        window.open('https://x.com/cryptobtcaiwiki', '_blank');
+                      }}
+                    >
+                      <IconTwitter
+                        sx={{ fontSize: '20px', color: 'inherit' }}
+                      />
+                      <Box
+                        sx={{
+                          lineHeight: '24px',
+                          fontSize: '14px',
+                          color: 'inherit',
+                        }}
+                      >
+                        官方推特
+                      </Box>
+                    </Stack>
                   </Stack>
                 </Box>
               )}
@@ -511,127 +445,35 @@ const Footer = React.memo(
                     </Box>
                   )}
                   <Stack direction={'column'} gap={'26px'}>
-                    {customStyle?.social_media_accounts?.map(
-                      (account, index) => {
-                        return (
-                          <Stack
-                            direction={'row'}
-                            key={index}
-                            alignItems='center'
-                            sx={theme => ({
-                              position: 'relative',
-                              '&:hover': {
-                                color: theme.palette.primary.main,
-                              },
-                              '&:hover .popup': {
-                                display: 'flex !important',
-                              },
-                              color: alpha(theme.palette.text.primary, 0.7),
-                              cursor: 'default',
-                            })}
-                            gap={1}
-                          >
-                            {account.channel === 'wechat_oa' && (
-                              <IconWeixingongzhonghao
-                                sx={{ fontSize: '18px', color: 'inherit' }}
-                              ></IconWeixingongzhonghao>
-                            )}
-                            {account.channel === 'phone' && (
-                              <IconDianhua
-                                sx={{ fontSize: '16px', color: 'inherit' }}
-                              ></IconDianhua>
-                            )}
-
-                            <Box
-                              sx={{
-                                lineHeight: '24px',
-                                fontSize: '14px',
-                                color: 'inherit',
-                              }}
-                            >
-                              {account.text}
-                            </Box>
-                            {account.channel === 'wechat_oa' &&
-                              (account?.text || account?.icon) && (
-                                <Stack
-                                  className={'popup'}
-                                  direction={'column'}
-                                  alignItems={'center'}
-                                  p={1.5}
-                                  sx={theme => ({
-                                    position: 'absolute',
-                                    bottom: '100%',
-                                    transform: 'translateY(-10px)',
-                                    left: 0,
-                                    boxShadow:
-                                      ' 0px 4px 8px 0px ' +
-                                      alpha(theme.palette.text.primary, 0.25),
-                                    borderRadius: '4px',
-                                    bgcolor: theme.palette.background.default,
-                                  })}
-                                  gap={1}
-                                  display={'none'}
-                                  zIndex={999}
-                                >
-                                  {account.icon && (
-                                    <img
-                                      src={account.icon}
-                                      width={120}
-                                      height={120}
-                                    ></img>
-                                  )}
-                                  {account.text && (
-                                    <Box
-                                      sx={{
-                                        fontSize: '12px',
-                                        lineHeight: '16px',
-                                        color: 'text.primary',
-                                        maxWidth: '120px',
-                                        textAlign: 'center',
-                                      }}
-                                    >
-                                      {account.text}
-                                    </Box>
-                                  )}
-                                </Stack>
-                              )}
-                            {account.channel === 'phone' && account?.phone && (
-                              <Stack
-                                className={'popup'}
-                                px={1.5}
-                                py={1}
-                                sx={theme => ({
-                                  position: 'absolute',
-                                  bottom: '100%',
-                                  transform: 'translateY(-10px)',
-                                  left: 0,
-                                  boxShadow:
-                                    '0px 4px 8px 0px ' +
-                                    alpha(theme.palette.text.primary, 0.25),
-                                  borderRadius: '4px',
-                                  bgcolor: theme.palette.background.default,
-                                })}
-                                display={'none'}
-                                zIndex={999}
-                              >
-                                {account.phone && (
-                                  <Box
-                                    sx={{
-                                      fontSize: '14px',
-                                      lineHeight: '16px',
-                                      color: 'text.primary',
-                                      textAlign: 'center',
-                                    }}
-                                  >
-                                    {account.phone}
-                                  </Box>
-                                )}
-                              </Stack>
-                            )}
-                          </Stack>
-                        );
-                      },
-                    )}
+                    {/* 官方推特链接 */}
+                    <Stack
+                      direction={'row'}
+                      sx={theme => ({
+                        position: 'relative',
+                        '&:hover': {
+                          color: theme.palette.primary.main,
+                        },
+                        color: alpha(theme.palette.text.primary, 0.7),
+                        cursor: 'pointer',
+                      })}
+                      gap={1}
+                      onClick={() => {
+                        window.open('https://x.com/cryptobtcaiwiki', '_blank');
+                      }}
+                    >
+                      <IconTwitter
+                        sx={{ fontSize: '20px', color: 'inherit' }}
+                      />
+                      <Box
+                        sx={{
+                          lineHeight: '24px',
+                          fontSize: '14px',
+                          color: 'inherit',
+                        }}
+                      >
+                        官方推特
+                      </Box>
+                    </Stack>
                   </Stack>
                 </Stack>
               )}
