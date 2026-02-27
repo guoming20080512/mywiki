@@ -230,6 +230,7 @@ export { default as IconYidongduan } from './IconYidongduan';
 export { default as IconYingweida } from './IconYingweida';
 export { default as IconYonghuwenjianjia } from './IconYonghuwenjianjia';
 export { default as IconYoutuzuozi } from './IconYoutuzuozi';
+export { default as IconYoutube } from './IconYoutube';
 export { default as IconYouxiang } from './IconYouxiang';
 export { default as IconYouxiang1 } from './IconYouxiang1';
 export { default as IconYulan } from './IconYulan';

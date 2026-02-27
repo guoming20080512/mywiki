@@ -6,6 +6,7 @@ import {
   IconDianhua,
   IconWeixingongzhonghao,
   IconTwitter,
+  IconYoutube,
 } from '@panda-wiki/icons';
 import Overlay from './Overlay';
 import { decodeBase64 } from '../utils';
@@ -164,6 +165,34 @@ const Footer = React.memo(
                         }}
                       >
                         官方推特
+                      </Box>
+                    </Stack>
+                    {/* 官方 YouTube 链接 */}
+                    <Stack
+                      direction={'row'}
+                      sx={theme => ({
+                        position: 'relative',
+                        color: alpha(theme.palette.text.primary, 0.7),
+                      })}
+                      gap={1}
+                      onClick={() => {
+                        window.open(
+                          'https://www.youtube.com/@cryptobtc_ai_wiki',
+                          '_blank',
+                        );
+                      }}
+                    >
+                      <IconYoutube
+                        sx={{ fontSize: '20px', color: 'inherit' }}
+                      />
+                      <Box
+                        sx={{
+                          lineHeight: '24px',
+                          fontSize: '14px',
+                          color: 'inherit',
+                        }}
+                      >
+                        官方 YouTube
                       </Box>
                     </Stack>
                   </Stack>
@@ -472,6 +501,38 @@ const Footer = React.memo(
                         }}
                       >
                         官方推特
+                      </Box>
+                    </Stack>
+                    {/* 官方 YouTube 链接 */}
+                    <Stack
+                      direction={'row'}
+                      sx={theme => ({
+                        position: 'relative',
+                        '&:hover': {
+                          color: theme.palette.primary.main,
+                        },
+                        color: alpha(theme.palette.text.primary, 0.7),
+                        cursor: 'pointer',
+                      })}
+                      gap={1}
+                      onClick={() => {
+                        window.open(
+                          'https://www.youtube.com/@cryptobtc_ai_wiki',
+                          '_blank',
+                        );
+                      }}
+                    >
+                      <IconYoutube
+                        sx={{ fontSize: '20px', color: 'inherit' }}
+                      />
+                      <Box
+                        sx={{
+                          lineHeight: '24px',
+                          fontSize: '14px',
+                          color: 'inherit',
+                        }}
+                      >
+                        官方 YouTube
                       </Box>
                     </Stack>
                   </Stack>
