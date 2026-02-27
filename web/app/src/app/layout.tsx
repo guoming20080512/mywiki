@@ -50,22 +50,23 @@ export async function generateMetadata(): Promise<Metadata> {
   const icon = getImagePath(kbDetail?.settings?.icon || '', basePath);
 
   // 使用cryptobtc作为网站名称，添加描述性内容和服务地区信息
-  const title = 'cryptobtc - 加密资产百科全书 ';
+  const title =
+    'cryptobtc - 加密资产ai百科全书 - ai深度答疑 - 助您轻松掌控加密资产';
 
   return {
     metadataBase: new URL(process.env.TARGET || ''),
     title,
     description:
-      'cryptobtc是专注于加密资产的百科全书，提供全面、专业的区块链和数字货币知识，包括比特币、以太坊等主流加密货币的介绍、解析、投资指南和市场分析。提供专业的AI智能答疑，提供专业、准确、及时、全面的加密资产信息，实时解答用户的相关问题，为用户的加密资产相关决策提供科学、客观的参考依据。',
+      'cryptobtc是专注于加密资产的ai百科全书，提供全面、专业的区块链和数字货币知识，包括比特币、以太坊等主流加密货币的介绍、解析、投资指南和市场分析。提供专业的AI智能答疑，提供专业、准确、及时、全面的加密资产信息，实时解答用户的相关问题，为用户的加密资产相关决策提供科学、客观的参考依据。',
     keywords:
-      'cryptobtc,加密资产,区块链,数字货币,百科全书,wiki,crypto,bitcoin,香港,澳门',
+      'cryptobtc,cryptoai,ai,加密资产,区块链,数字货币,百科全书,wiki,crypto,bitcoin,香港,澳门',
     icons: {
       icon: icon || `${basePath}/favicon.png`,
     },
     openGraph: {
       title,
       description:
-        'cryptobtc是专注于加密资产的百科全书，提供全面、专业的区块链和数字货币知识，包括比特币、以太坊等主流加密货币的介绍、解析、投资指南和市场分析。提供专业的AI智能答疑，提供专业、准确、及时、全面的加密资产信息，实时解答用户的相关问题，为用户的加密资产相关决策提供科学、客观的参考依据。',
+        'cryptobtc是专注于加密资产的ai百科全书，提供全面、专业的区块链和数字货币知识，包括比特币、以太坊等主流加密货币的介绍、解析、投资指南和市场分析。提供专业的AI智能答疑，提供专业、准确、及时、全面的加密资产信息，实时解答用户的相关问题，为用户的加密资产相关决策提供科学、客观的参考依据。',
       images: icon ? [icon] : [],
     },
   };
