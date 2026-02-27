@@ -144,7 +144,7 @@ const Footer = React.memo(
                       {footerSetting.brand_desc}
                     </Box>
                   )}
-                  <Stack direction={'column'} gap={2.5} mt={2}>
+                  <Stack direction={'row'} gap={3} flexWrap='wrap' mt={2}>
                     {/* 官方推特链接 */}
                     <Stack
                       direction={'row'}
@@ -465,7 +465,7 @@ const Footer = React.memo(
                       {footerSetting.brand_desc}
                     </Box>
                   )}
-                  <Stack direction={'column'} gap={'26px'}>
+                  <Stack direction={'row'} gap={3} flexWrap='wrap'>
                     {/* 官方推特链接 */}
                     <Stack
                       direction={'row'}
