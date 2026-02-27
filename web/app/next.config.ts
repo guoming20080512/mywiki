@@ -27,16 +27,6 @@ const nextConfig: NextConfig = {
           },
         ],
       },
-      {
-        source: '/:path*',
-        headers: [
-          {
-            key: 'Content-Security-Policy',
-            value:
-              "default-src 'self'; connect-src 'self' https://sentry.baizhi.cloud; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; worker-src blob:",
-          },
-        ],
-      },
     ];
   },
   async rewrites() {
